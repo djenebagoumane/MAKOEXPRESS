@@ -25,6 +25,11 @@ function Router() {
           <Route path="/" component={Landing} />
           <Route path="/auth/login" component={Login} />
           <Route path="/auth/register" component={Register} />
+          <Route path="/tracking" component={Tracking} />
+          <Route path="/delivery/express" component={Landing} />
+          <Route path="/delivery/standard" component={Landing} />
+          <Route path="/delivery" component={Landing} />
+          <Route path="/driver/register" component={Landing} />
         </>
       ) : (
         <>
@@ -36,6 +41,8 @@ function Router() {
           <Route path="/driver/register" component={DriverRegistration} />
           <Route path="/driver/dashboard" component={DriverDashboard} />
           <Route path="/admin" component={AdminPanel} />
+          <Route path="/auth/login" component={Login} />
+          <Route path="/auth/register" component={Register} />
         </>
       )}
       <Route component={NotFound} />
