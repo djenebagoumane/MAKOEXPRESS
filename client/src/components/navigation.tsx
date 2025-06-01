@@ -13,11 +13,11 @@ export default function Navigation() {
     <header className="bg-white shadow-sm border-b border-mako-silver fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center space-x-3">
+          <Link href="/" className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
             <div className="bg-mako-green rounded-lg p-2">
-              <i className="fas fa-truck text-white text-xl"></i>
+              <i className="fas fa-truck text-white text-lg sm:text-xl"></i>
             </div>
-            <h1 className="text-2xl font-bold text-mako-dark">MAKOEXPRESS</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-mako-dark truncate">MAKOEXPRESS</h1>
           </Link>
           
           {isAuthenticated && (
@@ -68,7 +68,7 @@ export default function Navigation() {
             </button>
 
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <div className="hidden md:flex items-center space-x-2">
                   <div className="w-8 h-8 rounded-full bg-mako-green flex items-center justify-center">
                     <i className="fas fa-user text-white text-sm"></i>
@@ -81,10 +81,10 @@ export default function Navigation() {
                   onClick={startOnboarding}
                   variant="outline"
                   size="sm"
-                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white"
+                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white p-2 sm:px-3"
                 >
-                  <i className="fas fa-question-circle mr-2"></i>
-                  Guide
+                  <i className="fas fa-question-circle sm:mr-2"></i>
+                  <span className="hidden sm:inline">Guide</span>
                 </Button>
                 <Button 
                   onClick={() => window.location.href = "/auth/login"}
@@ -97,22 +97,23 @@ export default function Navigation() {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <Button 
                   onClick={startOnboarding}
                   variant="outline"
                   size="sm"
-                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white"
+                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white p-2 sm:px-3"
                 >
-                  <i className="fas fa-question-circle mr-2"></i>
-                  Guide
+                  <i className="fas fa-question-circle sm:mr-2"></i>
+                  <span className="hidden sm:inline">Guide</span>
                 </Button>
                 <Button 
                   onClick={() => window.location.href = "/auth/login"}
-                  className="bg-mako-green text-white hover:bg-green-600"
+                  size="sm"
+                  className="bg-mako-green text-white hover:bg-green-600 px-2 sm:px-4"
                 >
-                  <i className="fas fa-user mr-2"></i>
-                  Se connecter
+                  <i className="fas fa-user sm:mr-2"></i>
+                  <span className="hidden sm:inline">Se connecter</span>
                 </Button>
               </div>
             )}
