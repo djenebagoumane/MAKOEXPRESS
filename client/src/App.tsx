@@ -29,6 +29,8 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/delivery/express" component={DeliveryForm} />
+          <Route path="/delivery/standard" component={DeliveryForm} />
           <Route path="/delivery" component={DeliveryForm} />
           <Route path="/tracking" component={Tracking} />
           <Route path="/driver/register" component={DriverRegistration} />
