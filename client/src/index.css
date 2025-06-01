@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile optimizations */
+@layer base {
+  html {
+    /* Prevent zoom on input focus on iOS */
+    font-size: 16px;
+  }
+  
+  body {
+    /* Prevent bounce scrolling on iOS */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Touch-friendly tap targets */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prevent text selection on touch interfaces */
+  .touch-manipulation {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  
+  /* Better focus states for mobile */
+  button:focus, 
+  input:focus, 
+  select:focus, 
+  textarea:focus {
+    outline: 2px solid #008C6F;
+    outline-offset: 2px;
+  }
+}
+
 :root {
   --background: 0 0% 100%;
   --foreground: 0 0% 12%; /* Gris Anthracite #1E1E1E */

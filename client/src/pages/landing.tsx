@@ -13,45 +13,47 @@ export default function Landing() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="gradient-mako text-white py-16 lg:py-24 mt-16">
+      <section className="gradient-mako text-white py-12 sm:py-16 lg:py-24 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="space-y-4 sm:space-y-6 text-center lg:text-left">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight">
                 Livraison rapide et fiable à travers le Mali
               </h1>
-              <p className="text-xl text-green-100">
+              <p className="text-lg sm:text-xl text-green-100">
                 Envoyez vos colis en toute sécurité avec MAKOEXPRESS. 
                 Paiement facile avec MAKOPAY, suivi en temps réel et livreurs vérifiés.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col gap-3 sm:gap-4 max-w-md mx-auto lg:mx-0">
                 <Button 
-                  onClick={() => window.location.href = "/auth/register"}
-                  className="bg-white text-mako-green px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center"
+                  onClick={() => window.location.href = "/delivery"}
+                  className="bg-white text-mako-green h-12 sm:h-14 px-6 sm:px-8 rounded-xl font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center text-sm sm:text-base touch-manipulation"
                 >
                   <i className="fas fa-box mr-2"></i>
                   Envoyer un colis
                 </Button>
-                <Button 
-                  onClick={() => window.location.href = "/driver/register"}
-                  variant="outline"
-                  className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center"
-                >
-                  <i className="fas fa-motorcycle mr-2"></i>
-                  Devenir livreur
-                </Button>
-                <Button 
-                  onClick={startOnboarding}
-                  variant="outline"
-                  className="border-2 border-yellow-400 text-yellow-400 px-8 py-4 rounded-xl font-semibold hover:bg-yellow-400 hover:text-mako-anthracite transition-colors flex items-center justify-center"
-                >
-                  <i className="fas fa-question-circle mr-2"></i>
-                  Guide Tutoriel
-                </Button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button 
+                    onClick={() => window.location.href = "/driver/register"}
+                    variant="outline"
+                    className="border-2 border-white text-white h-12 px-4 sm:px-6 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center text-sm touch-manipulation"
+                  >
+                    <i className="fas fa-motorcycle mr-2"></i>
+                    Devenir livreur
+                  </Button>
+                  <Button 
+                    onClick={startOnboarding}
+                    variant="outline"
+                    className="border-2 border-yellow-400 text-yellow-400 h-12 px-4 sm:px-6 rounded-xl font-semibold hover:bg-yellow-400 hover:text-mako-anthracite transition-colors flex items-center justify-center text-sm touch-manipulation"
+                  >
+                    <i className="fas fa-question-circle mr-2"></i>
+                    Guide
+                  </Button>
+                </div>
                 <Button 
                   onClick={() => window.location.href = "/auth/login"}
                   variant="outline"
-                  className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center"
+                  className="border-2 border-white text-white h-12 sm:h-14 px-6 sm:px-8 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center text-sm sm:text-base touch-manipulation"
                 >
                   <i className="fas fa-user mr-2"></i>
                   Se connecter

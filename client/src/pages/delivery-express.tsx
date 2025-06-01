@@ -141,30 +141,30 @@ export default function DeliveryExpress() {
       <div className="pt-20 pb-20 md:pb-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* En-tête Express */}
-          <div className="text-center mb-8">
-            <div className="bg-white rounded-lg p-6 shadow-lg mb-6">
-              <h1 className="text-4xl font-bold text-mako-anthracite mb-4">
-                <i className="fas fa-bolt text-yellow-500 mr-3"></i>
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-lg mb-6">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-mako-anthracite mb-4">
+                <i className="fas fa-bolt text-yellow-500 mr-2 sm:mr-3"></i>
                 Livraison Express
               </h1>
-              <p className="text-xl text-mako-anthracite opacity-80 mb-4">
+              <p className="text-lg sm:text-xl text-mako-anthracite opacity-80 mb-4">
                 Livraison dans la journée pour Bamako
               </p>
-              <div className="grid md:grid-cols-3 gap-4 text-center">
-                <div className="bg-yellow-50 p-3 rounded-lg">
-                  <i className="fas fa-clock text-yellow-600 text-2xl mb-2"></i>
-                  <div className="text-sm font-semibold text-mako-anthracite">Délai</div>
-                  <div className="text-yellow-600 font-bold">1-6 heures</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
+                <div className="bg-yellow-50 p-3 sm:p-4 rounded-lg">
+                  <i className="fas fa-clock text-yellow-600 text-xl sm:text-2xl mb-2"></i>
+                  <div className="text-xs sm:text-sm font-semibold text-mako-anthracite">Délai</div>
+                  <div className="text-yellow-600 font-bold text-sm sm:text-base">1-6 heures</div>
                 </div>
-                <div className="bg-green-50 p-3 rounded-lg">
-                  <i className="fas fa-map-marker-alt text-green-600 text-2xl mb-2"></i>
-                  <div className="text-sm font-semibold text-mako-anthracite">Zone</div>
-                  <div className="text-green-600 font-bold">Bamako uniquement</div>
+                <div className="bg-green-50 p-3 sm:p-4 rounded-lg">
+                  <i className="fas fa-map-marker-alt text-green-600 text-xl sm:text-2xl mb-2"></i>
+                  <div className="text-xs sm:text-sm font-semibold text-mako-anthracite">Zone</div>
+                  <div className="text-green-600 font-bold text-sm sm:text-base">Bamako uniquement</div>
                 </div>
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <i className="fas fa-shield-alt text-blue-600 text-2xl mb-2"></i>
-                  <div className="text-sm font-semibold text-mako-anthracite">Garantie</div>
-                  <div className="text-blue-600 font-bold">100% Sécurisé</div>
+                <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                  <i className="fas fa-shield-alt text-blue-600 text-xl sm:text-2xl mb-2"></i>
+                  <div className="text-xs sm:text-sm font-semibold text-mako-anthracite">Garantie</div>
+                  <div className="text-blue-600 font-bold text-sm sm:text-base">100% Sécurisé</div>
                 </div>
               </div>
             </div>
@@ -178,10 +178,10 @@ export default function DeliveryExpress() {
               </CardTitle>
               <p>Livraison prioritaire dans la journée</p>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-4 sm:p-6 lg:p-8">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <FormField
                       control={form.control}
                       name="pickupAddress"
@@ -426,12 +426,12 @@ export default function DeliveryExpress() {
                     </div>
                   )}
 
-                  <div className="flex gap-4 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                     <Button
                       type="button"
                       variant="outline"
                       onClick={calculatePrice}
-                      className="flex-1"
+                      className="w-full sm:flex-1 h-12 sm:h-auto text-sm sm:text-base"
                     >
                       <i className="fas fa-calculator mr-2"></i>
                       Calculer le prix
@@ -439,14 +439,15 @@ export default function DeliveryExpress() {
                     <Button
                       type="submit"
                       disabled={mutation.isPending || calculatedPrice === 0}
-                      className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
+                      className="w-full sm:flex-1 h-12 sm:h-auto text-sm sm:text-base bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white touch-manipulation"
                     >
                       {mutation.isPending ? (
                         <i className="fas fa-spinner fa-spin mr-2"></i>
                       ) : (
                         <i className="fas fa-bolt mr-2"></i>
                       )}
-                      Confirmer livraison Express
+                      <span className="hidden sm:inline">Confirmer livraison Express</span>
+                      <span className="sm:hidden">Confirmer Express</span>
                     </Button>
                   </div>
                 </form>

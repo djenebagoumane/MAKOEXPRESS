@@ -188,15 +188,16 @@ export default function AddressAutocomplete({
               <button
                 key={suggestion.id}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className={`w-full text-left px-4 py-3 hover:bg-mako-green hover:text-white transition-colors border-b border-gray-100 last:border-b-0 ${
+                className={`w-full text-left px-4 py-4 hover:bg-mako-green hover:text-white transition-colors border-b border-gray-100 last:border-b-0 touch-manipulation ${
                   index === activeSuggestion ? 'bg-mako-green text-white' : ''
                 }`}
+                style={{ minHeight: '56px' }} // Taille tactile recommandée
               >
                 <div className="flex items-center space-x-3">
-                  <i className="fas fa-map-marker-alt text-mako-green"></i>
-                  <div>
-                    <div className="font-medium">{suggestion.address}</div>
-                    <div className="text-sm opacity-70">
+                  <i className={`fas fa-map-marker-alt ${index === activeSuggestion ? 'text-white' : 'text-mako-green'} text-lg`}></i>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm sm:text-base truncate">{suggestion.address}</div>
+                    <div className="text-xs sm:text-sm opacity-70 truncate">
                       {suggestion.city}, {suggestion.region}
                     </div>
                   </div>
