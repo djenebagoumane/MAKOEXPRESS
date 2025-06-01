@@ -78,6 +78,15 @@ export default function Navigation() {
                   </span>
                 </div>
                 <Button 
+                  onClick={startOnboarding}
+                  variant="outline"
+                  size="sm"
+                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white"
+                >
+                  <i className="fas fa-question-circle mr-2"></i>
+                  Guide
+                </Button>
+                <Button 
                   onClick={() => window.location.href = "/auth/login"}
                   variant="outline"
                   size="sm"
@@ -155,6 +164,16 @@ export default function Navigation() {
                 Devenir Livreur
               </Link>
               <div className="border-t border-mako-silver pt-2 mt-2">
+                <button 
+                  onClick={() => {
+                    startOnboarding();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-mako-green hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                >
+                  <i className="fas fa-question-circle mr-2"></i>
+                  Guide d'utilisation
+                </button>
                 <button 
                   onClick={() => window.location.href = "/auth/login"}
                   className="block w-full text-left px-3 py-2 text-mako-anthracite hover:bg-red-500 hover:text-white rounded-md transition-colors"
