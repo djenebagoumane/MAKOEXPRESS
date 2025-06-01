@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
+import OnboardingTutorial from "@/components/onboarding-tutorial";
+import { useOnboarding } from "@/hooks/useOnboarding";
 
 export default function Landing() {
+  const { showOnboarding, completeOnboarding, closeOnboarding } = useOnboarding();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -39,9 +43,9 @@ export default function Landing() {
               </div>
             </div>
             <div className="relative">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 h-80 flex items-center justify-center">
-                <div className="text-center text-mako-gray">
-                  <i className="fas fa-motorcycle text-6xl text-mako-green mb-4"></i>
+              <div className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center">
+                <div className="text-center">
+                  <i className="fas fa-motorcycle text-6xl mb-4"></i>
                   <p className="text-lg">Livreur professionnel au Mali</p>
                 </div>
               </div>
@@ -139,6 +143,13 @@ export default function Landing() {
       </section>
 
       <Footer />
+
+      {/* Tutoriel d'onboarding */}
+      <OnboardingTutorial
+        isOpen={showOnboarding}
+        onClose={closeOnboarding}
+        onComplete={completeOnboarding}
+      />
     </div>
   );
 }
