@@ -210,7 +210,12 @@ export default function DeliveryForm() {
                             Adresse de livraison
                           </FormLabel>
                           <FormControl>
-                            <Input placeholder="Ex: Quartier Hippodrome, Bamako" {...field} />
+                            <AddressAutocomplete
+                              value={field.value}
+                              onChange={field.onChange}
+                              placeholder="Rechercher l'adresse de livraison..."
+                              icon="fas fa-home"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
