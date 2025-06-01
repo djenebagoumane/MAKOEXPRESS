@@ -33,21 +33,21 @@ export default function Landing() {
                   Envoyer un colis
                 </Button>
                 <Button 
-                  onClick={() => window.location.href = "/auth/login"}
+                  onClick={() => window.location.href = "/driver/register"}
                   variant="outline"
                   className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center"
                 >
                   <i className="fas fa-motorcycle mr-2"></i>
                   Devenir livreur
                 </Button>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center">
-                <div className="text-center">
-                  <i className="fas fa-motorcycle text-6xl mb-4"></i>
-                  <p className="text-lg">Livreur professionnel au Mali</p>
-                </div>
+                <Button 
+                  onClick={() => window.location.href = "/auth/login"}
+                  variant="outline"
+                  className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center"
+                >
+                  <i className="fas fa-user mr-2"></i>
+                  Se connecter
+                </Button>
               </div>
             </div>
           </div>

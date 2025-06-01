@@ -14,6 +14,10 @@ import Tracking from "@/pages/tracking";
 import DriverRegistration from "@/pages/driver-registration";
 import DriverDashboard from "@/pages/driver-dashboard";
 import AdminPanel from "@/pages/admin-panel";
+import HelpCenter from "@/pages/help-center";
+import Contact from "@/pages/contact";
+import TermsOfService from "@/pages/terms-of-service";
+import PrivacyPolicy from "@/pages/privacy-policy";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
@@ -33,6 +37,10 @@ function Router() {
           <Route path="/delivery/standard" component={DeliveryStandard} />
           <Route path="/delivery" component={DeliveryForm} />
           <Route path="/driver/register" component={BecomeDriver} />
+          <Route path="/help" component={HelpCenter} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/terms" component={TermsOfService} />
+          <Route path="/privacy" component={PrivacyPolicy} />
         </>
       ) : (
         <>
