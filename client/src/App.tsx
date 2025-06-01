@@ -52,6 +52,10 @@ function Router() {
           <Route path="/driver/register" component={BecomeDriver} />
           <Route path="/driver/dashboard" component={DriverDashboard} />
           <Route path="/admin" component={AdminPanel} />
+          <Route path="/help" component={HelpCenter} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/terms" component={TermsOfService} />
+          <Route path="/privacy" component={PrivacyPolicy} />
           <Route path="/auth/login" component={Login} />
           <Route path="/auth/register" component={Register} />
         </>

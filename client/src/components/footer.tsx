@@ -59,24 +59,24 @@ export default function Footer() {
             <h5 className="font-semibold mb-4">Support</h5>
             <ul className="space-y-2 text-gray-400">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/help" className="hover:text-white transition-colors">
                   Centre d'Aide
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/contact" className="hover:text-white transition-colors">
                   Contact
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/terms" className="hover:text-white transition-colors">
                   Conditions d'Utilisation
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/privacy" className="hover:text-white transition-colors">
                   Politique de Confidentialité
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
