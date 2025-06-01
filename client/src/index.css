@@ -4,29 +4,35 @@
 
 :root {
   --background: 0 0% 100%;
-  --foreground: 20 14.3% 4.1%;
-  --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 44.7%;
+  --foreground: 0 0% 12%; /* Gris Anthracite #1E1E1E */
+  --muted: 0 0% 96%; /* Gris Clair #F5F5F5 */
+  --muted-foreground: 0 0% 12%;
   --popover: 0 0% 100%;
-  --popover-foreground: 20 14.3% 4.1%;
+  --popover-foreground: 0 0% 12%;
   --card: 0 0% 100%;
-  --card-foreground: 20 14.3% 4.1%;
-  --border: 20 5.9% 90%;
-  --input: 20 5.9% 90%;
-  --primary: 140 46% 54%; /* MAKO Green #3FAF62 */
+  --card-foreground: 0 0% 12%;
+  --border: 0 0% 96%;
+  --input: 0 0% 96%;
+  --primary: 177 100% 27%; /* Vert MAKO #008C6F */
   --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 92%; /* MAKO Silver #EAEAEA */
-  --secondary-foreground: 24 9.8% 10%;
-  --accent: 0 0% 92%;
-  --accent-foreground: 24 9.8% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 140 46% 54%;
+  --secondary: 0 0% 96%; /* Gris Clair #F5F5F5 */
+  --secondary-foreground: 0 0% 12%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 12%;
+  --destructive: 0 66% 56%; /* Erreur #E53935 */
+  --destructive-foreground: 0 0% 100%;
+  --ring: 177 100% 27%;
   --radius: 0.5rem;
-  --mako-green: 140 46% 54%; /* #3FAF62 */
-  --mako-silver: 0 0% 92%; /* #EAEAEA */
-  --mako-dark: 213 31% 23%; /* #2D3748 */
-  --mako-gray: 210 7% 44%; /* #6C757D */
+  --mako-green: 177 100% 27%; /* Vert MAKO #008C6F */
+  --mako-jade: 177 98% 29%; /* Vert Jade Clair #00A88E */
+  --mako-deep: 177 100% 16%; /* Vert Profond #004D3F */
+  --mako-white: 0 0% 100%; /* Blanc Pur #FFFFFF */
+  --mako-anthracite: 0 0% 12%; /* Gris Anthracite #1E1E1E */
+  --mako-light: 0 0% 96%; /* Gris Clair #F5F5F5 */
+  --mako-success: 142 76% 52%; /* Succès #4CAF50 */
+  --mako-error: 0 66% 56%; /* Erreur #E53935 */
+  --mako-info: 207 90% 54%; /* Information #2196F3 */
+  --mako-warning: 36 100% 50%; /* Avertissement #FB8C00 */
 }
 
 .dark {
@@ -68,27 +74,43 @@
     background-color: hsl(var(--mako-green));
   }
   
+  .bg-mako-jade {
+    background-color: hsl(var(--mako-jade));
+  }
+  
+  .bg-mako-deep {
+    background-color: hsl(var(--mako-deep));
+  }
+  
   .text-mako-green {
     color: hsl(var(--mako-green));
+  }
+  
+  .text-mako-jade {
+    color: hsl(var(--mako-jade));
+  }
+  
+  .text-mako-deep {
+    color: hsl(var(--mako-deep));
+  }
+  
+  .text-mako-anthracite {
+    color: hsl(var(--mako-anthracite));
+  }
+  
+  .text-mako-light {
+    color: hsl(var(--mako-light));
   }
   
   .border-mako-green {
     border-color: hsl(var(--mako-green));
   }
   
-  .bg-mako-silver {
-    background-color: hsl(var(--mako-silver));
-  }
-  
-  .text-mako-dark {
-    color: hsl(var(--mako-dark));
-  }
-  
-  .text-mako-gray {
-    color: hsl(var(--mako-gray));
+  .bg-mako-light {
+    background-color: hsl(var(--mako-light));
   }
   
   .gradient-mako {
-    background: linear-gradient(135deg, hsl(var(--mako-green)), hsl(140 46% 48%));
+    background: linear-gradient(135deg, hsl(var(--mako-green)), hsl(var(--mako-jade)));
   }
 }

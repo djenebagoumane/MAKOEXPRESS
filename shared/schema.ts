@@ -25,16 +25,19 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table - required for Replit Auth
+// User storage table - simple auth with phone or email
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
+  id: serial("id").primaryKey(),
   email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
+  phoneNumber: varchar("phone_number").unique(),
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  password: varchar("password").notNull(),
   profileImageUrl: varchar("profile_image_url"),
-  phoneNumber: varchar("phone_number"),
   address: text("address"),
   role: varchar("role").notNull().default("customer"), // customer, driver, admin
+  isVerified: boolean("is_verified").default(false),
+  verificationCode: varchar("verification_code"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -42,7 +45,7 @@ export const users = pgTable("users", {
 // Driver profiles table
 export const drivers = pgTable("drivers", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   vehicleType: varchar("vehicle_type").notNull(), // moto, vélo, voiture, à pied
   age: integer("age").notNull(),
   profileImageUrl: varchar("profile_image_url"),
@@ -59,8 +62,8 @@ export const drivers = pgTable("drivers", {
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   trackingNumber: varchar("tracking_number").notNull().unique(),
-  customerId: varchar("customer_id").notNull().references(() => users.id),
-  driverId: varchar("driver_id").references(() => users.id),
+  customerId: integer("customer_id").notNull().references(() => users.id),
+  driverId: integer("driver_id").references(() => users.id),
   pickupAddress: text("pickup_address").notNull(),
   deliveryAddress: text("delivery_address").notNull(),
   packageType: varchar("package_type").notNull(),
@@ -93,8 +96,8 @@ export const orderStatusHistory = pgTable("order_status_history", {
 export const driverRatings = pgTable("driver_ratings", {
   id: serial("id").primaryKey(),
   orderId: integer("order_id").notNull().references(() => orders.id),
-  customerId: varchar("customer_id").notNull().references(() => users.id),
-  driverId: varchar("driver_id").notNull().references(() => users.id),
+  customerId: integer("customer_id").notNull().references(() => users.id),
+  driverId: integer("driver_id").notNull().references(() => users.id),
   rating: integer("rating").notNull(), // 1-5
   comment: text("comment"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -149,8 +152,26 @@ export const driverRatingsRelations = relations(driverRatings, ({ one }) => ({
   }),
 }));
 
+// Auth schemas
+export const registerSchema = z.object({
+  firstName: z.string().min(1, "Le prénom est requis"),
+  lastName: z.string().min(1, "Le nom est requis"),
+  email: z.string().email("Email invalide").optional(),
+  phoneNumber: z.string().min(8, "Numéro de téléphone invalide").optional(),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+}).refine(data => data.email || data.phoneNumber, {
+  message: "Email ou numéro de téléphone requis",
+  path: ["email"]
+});
+
+export const loginSchema = z.object({
+  identifier: z.string().min(1, "Email ou téléphone requis"),
+  password: z.string().min(1, "Mot de passe requis"),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -179,6 +200,8 @@ export const insertDriverRatingSchema = createInsertSchema(driverRatings).omit({
 });
 
 // Types
+export type RegisterUser = z.infer<typeof registerSchema>;
+export type LoginUser = z.infer<typeof loginSchema>;
 export type UpsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertDriver = z.infer<typeof insertDriverSchema>;
