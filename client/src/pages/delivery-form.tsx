@@ -33,7 +33,30 @@ export default function DeliveryForm() {
   const [calculatedPrice, setCalculatedPrice] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  
+  // Détecter le type de service basé sur l'URL
+  const serviceType = location.includes('/express') ? 'express' : 
+                     location.includes('/standard') ? 'standard' : 'standard';
+  
+  const serviceConfig = {
+    express: {
+      title: "Livraison Express",
+      subtitle: "Livraison dans la journée pour Bamako",
+      icon: "fas fa-bolt",
+      urgencyOptions: ["urgent", "très urgent"],
+      basePrice: 3000
+    },
+    standard: {
+      title: "Livraison Standard", 
+      subtitle: "Livraison sous 24-48h dans tout le Mali",
+      icon: "fas fa-truck",
+      urgencyOptions: ["standard", "normal"],
+      basePrice: 2000
+    }
+  };
+  
+  const currentService = serviceConfig[serviceType];
 
   const form = useForm<DeliveryFormData>({
     resolver: zodResolver(deliverySchema),
@@ -85,7 +108,7 @@ export default function DeliveryForm() {
       return;
     }
 
-    let basePrice = 1500;
+    let basePrice = currentService.basePrice;
     
     // Weight multiplier
     switch (weight) {
@@ -145,11 +168,11 @@ export default function DeliveryForm() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="shadow-xl">
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-bold text-mako-dark mb-4">
-                <i className="fas fa-box mr-2 text-mako-green"></i>
-                Demander une Livraison
+              <CardTitle className="text-3xl font-bold text-mako-anthracite mb-4">
+                <i className={`${currentService.icon} mr-2 text-mako-green`}></i>
+                {currentService.title}
               </CardTitle>
-              <p className="text-mako-gray">Remplissez le formulaire pour obtenir un devis instantané</p>
+              <p className="text-mako-anthracite opacity-70">{currentService.subtitle}</p>
             </CardHeader>
             <CardContent className="p-8">
               <Form {...form}>
