@@ -78,10 +78,13 @@ export default function Navigation() {
                   </span>
                 </div>
                 <Button 
-                  onClick={startOnboarding}
+                  onClick={() => {
+                    console.log("Guide button clicked (authenticated)");
+                    startOnboarding();
+                  }}
                   variant="outline"
                   size="sm"
-                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white p-2 sm:px-3"
+                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white p-2 sm:px-3 cursor-pointer"
                 >
                   <i className="fas fa-question-circle sm:mr-2"></i>
                   <span className="hidden sm:inline">Guide</span>
@@ -99,10 +102,13 @@ export default function Navigation() {
             ) : (
               <div className="flex items-center space-x-2">
                 <Button 
-                  onClick={startOnboarding}
+                  onClick={() => {
+                    console.log("Guide button clicked (not authenticated)");
+                    startOnboarding();
+                  }}
                   variant="outline"
                   size="sm"
-                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white p-2 sm:px-3"
+                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white p-2 sm:px-3 cursor-pointer"
                 >
                   <i className="fas fa-question-circle sm:mr-2"></i>
                   <span className="hidden sm:inline">Guide</span>
