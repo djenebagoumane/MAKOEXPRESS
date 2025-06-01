@@ -86,11 +86,11 @@ export default function Footer() {
             <div className="space-y-2 text-gray-400">
               <p>
                 <i className="fas fa-phone mr-2"></i>
-                +223 20 12 34 56
+                +223 75700265
               </p>
               <p>
                 <i className="fas fa-envelope mr-2"></i>
-                contact@makoexpress.ml
+                contact@makoexpress.com
               </p>
               <p>
                 <i className="fas fa-map-marker-alt mr-2"></i>
@@ -101,7 +101,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-gray-700 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 MAKOEXPRESS. Tous droits réservés. Propulsé par l'écosystème MAKO.</p>
+          <p>&copy; 2025 MAKOEXPRESS. Tous droits réservés. Propulsé par l'écosystème MAKO.</p>
         </div>
       </div>
     </footer>

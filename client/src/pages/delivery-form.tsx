@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
+import AddressAutocomplete from "@/components/address-autocomplete";
 import MobileNav from "@/components/mobile-nav";
 import { useLocation } from "wouter";
 
@@ -188,7 +189,12 @@ export default function DeliveryForm() {
                             Adresse de collecte
                           </FormLabel>
                           <FormControl>
-                            <Input placeholder="Ex: Quartier ACI 2000, Bamako" {...field} />
+                            <AddressAutocomplete
+                              value={field.value}
+                              onChange={field.onChange}
+                              placeholder="Rechercher l'adresse de collecte..."
+                              icon="fas fa-box"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

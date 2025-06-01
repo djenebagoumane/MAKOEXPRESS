@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
+import AddressAutocomplete from "@/components/address-autocomplete";
 
 const expressDeliverySchema = z.object({
   pickupAddress: z.string().min(1, "L'adresse de collecte est requise"),
@@ -191,13 +192,14 @@ export default function DeliveryExpress() {
                             Adresse de collecte
                           </FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Ex: ACI 2000, Bamako" 
-                              {...field} 
-                              onChange={(e) => {
-                                field.onChange(e);
+                            <AddressAutocomplete
+                              value={field.value}
+                              onChange={(value) => {
+                                field.onChange(value);
                                 calculatePrice();
                               }}
+                              placeholder="Rechercher l'adresse de collecte..."
+                              icon="fas fa-box"
                             />
                           </FormControl>
                           <FormMessage />
@@ -215,13 +217,14 @@ export default function DeliveryExpress() {
                             Adresse de livraison
                           </FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Ex: Hippodrome, Bamako" 
-                              {...field}
-                              onChange={(e) => {
-                                field.onChange(e);
+                            <AddressAutocomplete
+                              value={field.value}
+                              onChange={(value) => {
+                                field.onChange(value);
                                 calculatePrice();
                               }}
+                              placeholder="Rechercher l'adresse de livraison..."
+                              icon="fas fa-home"
                             />
                           </FormControl>
                           <FormMessage />
