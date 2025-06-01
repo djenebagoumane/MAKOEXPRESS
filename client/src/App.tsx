@@ -12,6 +12,8 @@ import DriverRegistration from "@/pages/driver-registration";
 import DriverDashboard from "@/pages/driver-dashboard";
 import AdminPanel from "@/pages/admin-panel";
 import NotFound from "@/pages/not-found";
+import Login from "@/pages/auth/login";
+import Register from "@/pages/auth/register";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -19,7 +21,11 @@ function Router() {
   return (
     <Switch>
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/auth/login" component={Login} />
+          <Route path="/auth/register" component={Register} />
+        </>
       ) : (
         <>
           <Route path="/" component={Home} />
