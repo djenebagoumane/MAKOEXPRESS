@@ -22,14 +22,14 @@ export default function Landing() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
-                  onClick={() => window.location.href = "/api/login"}
+                  onClick={() => window.location.href = "/auth/register"}
                   className="bg-white text-mako-green px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center"
                 >
                   <i className="fas fa-box mr-2"></i>
                   Envoyer un colis
                 </Button>
                 <Button 
-                  onClick={() => window.location.href = "/api/login"}
+                  onClick={() => window.location.href = "/auth/login"}
                   variant="outline"
                   className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center"
                 >
@@ -54,8 +54,8 @@ export default function Landing() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-mako-dark mb-4">Nos Services</h2>
-            <p className="text-mako-gray text-lg max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-mako-anthracite mb-4">Nos Services</h2>
+            <p className="text-mako-anthracite opacity-70 text-lg max-w-2xl mx-auto">
               Une solution complète de livraison adaptée aux besoins du Mali
             </p>
           </div>
@@ -66,8 +66,8 @@ export default function Landing() {
                 <div className="bg-mako-green rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <i className="fas fa-shipping-fast text-white text-2xl"></i>
                 </div>
-                <h3 className="text-xl font-semibold text-mako-dark mb-3">Livraison Express</h3>
-                <p className="text-mako-gray">Livraison dans la journée pour Bamako et principales villes du Mali</p>
+                <h3 className="text-xl font-semibold text-mako-anthracite mb-3">Livraison Express</h3>
+                <p className="text-mako-anthracite opacity-70">Livraison dans la journée pour Bamako et principales villes du Mali</p>
               </CardContent>
             </Card>
             
