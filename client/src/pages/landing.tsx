@@ -6,7 +6,7 @@ import OnboardingTutorial from "@/components/onboarding-tutorial";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
 export default function Landing() {
-  const { showOnboarding, completeOnboarding, closeOnboarding } = useOnboarding();
+  const { showOnboarding, completeOnboarding, closeOnboarding, startOnboarding } = useOnboarding();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -39,6 +39,14 @@ export default function Landing() {
                 >
                   <i className="fas fa-motorcycle mr-2"></i>
                   Devenir livreur
+                </Button>
+                <Button 
+                  onClick={startOnboarding}
+                  variant="outline"
+                  className="border-2 border-yellow-400 text-yellow-400 px-8 py-4 rounded-xl font-semibold hover:bg-yellow-400 hover:text-mako-anthracite transition-colors flex items-center justify-center"
+                >
+                  <i className="fas fa-question-circle mr-2"></i>
+                  Guide Tutoriel
                 </Button>
                 <Button 
                   onClick={() => window.location.href = "/auth/login"}
