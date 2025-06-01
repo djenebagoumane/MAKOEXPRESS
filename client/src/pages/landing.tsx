@@ -60,6 +60,11 @@ export default function Landing() {
                 </Button>
               </div>
             </div>
+            <div className="hidden lg:block">
+              <div className="bg-white/10 rounded-2xl p-8 backdrop-blur-sm">
+                <img src="/api/placeholder/400/300" alt="Livraison Mali" className="w-full rounded-xl"/>
+              </div>
+            </div>
           </div>
         </div>
       </section>

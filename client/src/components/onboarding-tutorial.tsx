@@ -124,6 +124,7 @@ export default function OnboardingTutorial({ isOpen, onClose, onComplete }: Onbo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
+          <DialogTitle className="sr-only">Guide d'utilisation MAKOEXPRESS</DialogTitle>
           <div className="flex items-center justify-between">
             <Badge variant="secondary" className="bg-mako-green text-white">
               Étape {currentStep + 1} sur {tutorialSteps.length}
