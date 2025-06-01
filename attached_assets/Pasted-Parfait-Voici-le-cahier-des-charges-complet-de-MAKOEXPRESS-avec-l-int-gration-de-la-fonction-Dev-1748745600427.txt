@@ -1,0 +1,127 @@
+Parfait ! Voici le cahier des charges complet de MAKOEXPRESS, avec l’intégration de la fonction “Devenir livreur”, et d’autres fonctionnalités professionnelles pour une application de livraison efficace et sécurisée dans l’écosystème MAKO.
+
+⸻
+
+📄 Cahier des charges – MAKOEXPRESS
+
+🏷 Nom du service :
+
+MAKOEXPRESS
+
+⸻
+
+🎯 Objectif principal :
+
+Offrir un service de livraison rapide, fiable et accessible pour les vendeurs de MAKOMALI, les clients et tout autre utilisateur local (particulier ou professionnel), avec intégration totale à MAKOPAY.
+
+⸻
+
+👥 Public cible :
+	•	Acheteurs sur MAKOMALI
+	•	Vendeurs locaux
+	•	Particuliers envoyant des colis entre quartiers ou villes
+	•	Personnes souhaitant devenir livreurs partenaires
+
+⸻
+
+🌐 Plateformes :
+	•	Application Web (Replit / Web App)
+	•	Version mobile via PWA ou export APK (Capacitor, Vercel, etc.)
+
+⸻
+
+🌍 Zone géographique :
+	•	Mali (extension possible en Afrique de l’Ouest)
+
+⸻
+
+🧩 Fonctionnalités principales
+
+👤 Pour les utilisateurs (clients) :
+	•	Créer un compte
+	•	Demander une livraison : adresse de départ et d’arrivée, type de colis, poids
+	•	Calcul automatique du tarif (selon distance, poids, urgence)
+	•	Suivi du statut de livraison (préparé → en route → livré)
+	•	Paiement via MAKOPAY
+	•	Notifications (email, SMS ou dans l’app) à chaque étape
+	•	Historique de ses livraisons
+
+⸻
+
+🛵 Pour les livreurs :
+
+🔹 Inscription comme livreur :
+	•	Remplir un formulaire de candidature :
+	•	Nom complet
+	•	Âge
+	•	Téléphone
+	•	Type de véhicule
+	•	Photo de profil
+	•	Pièce d’identité (upload scan/photo)
+	•	Disponibilité
+	•	Attente de validation par l’équipe MAKOEXPRESS
+
+🔹 Après validation :
+	•	Accès à un Tableau de bord livreur
+	•	Voir les livraisons disponibles
+	•	Accepter/rejeter une mission
+	•	Statut du colis : “Pris en charge” → “Livré”
+	•	Suivi de ses gains via MAKOPAY
+	•	Historique des missions
+
+⸻
+
+🧑‍💼 Pour l’administration MAKOEXPRESS :
+	•	Tableau de gestion des livreurs :
+	•	Valider/rejeter candidatures
+	•	Suivre la performance (taux de livraison, retards)
+	•	Tableau de gestion des commandes
+	•	Support et gestion de litiges
+	•	Notifications aux clients/livreurs en cas de problème
+
+⸻
+
+🎨 Design UI / UX (à respecter)
+	•	Couleurs de marque :
+	•	Vert : #3FAF62
+	•	Blanc : #FFFFFF
+	•	Argenté clair : #EAEAEA
+	•	Style visuel : Moderne, simple, accessible
+	•	Icônes : Font Awesome (📦 🛵 🗺️ 👤 💳)
+	•	Design responsive (web et mobile)
+
+⸻
+
+🔐 Sécurité :
+	•	Identification obligatoire des livreurs
+	•	Historique de chaque livraison enregistré
+	•	Vérification manuelle des livreurs
+	•	Option de notes/avis des clients sur les livreurs
+
+⸻
+
+🔌 Intégrations nécessaires :
+	•	MAKOPAY API : pour les paiements clients/livreurs
+	•	Module de géolocalisation (version avancée)
+	•	Firebase ou base locale pour :
+	•	Utilisateurs
+	•	Livreurs
+	•	Commandes
+	•	Paiements
+	•	Historique
+
+⸻
+
+📁 Format du projet :
+	•	HTML/CSS/JS sur Replit
+	•	Firebase ou Supabase pour base de données
+	•	Export possible en app (via PWA Builder ou Capacitor)
+
+⸻
+
+Souhaites-tu maintenant :
+	•	Un template en Replit prêt à démarrer ?
+	•	Ou un document PDF de ce cahier des charges à télécharger et imprimer ?
+	•	Ou un schéma visuel (mindmap / workflow) pour mieux représenter le projet ?
+
+Je peux te livrer les trois si tu veux.
