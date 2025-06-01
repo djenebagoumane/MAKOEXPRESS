@@ -19,27 +19,28 @@ import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations - required for Replit Auth
-  getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
+  // User operations - simple auth
+  getUser(id: number): Promise<User | undefined>;
+  getUserByIdentifier(identifier: string): Promise<User | undefined>;
+  createUser(user: UpsertUser): Promise<User>;
   
   // Driver operations
   createDriver(driver: InsertDriver): Promise<Driver>;
-  getDriverByUserId(userId: string): Promise<Driver | undefined>;
+  getDriverByUserId(userId: number): Promise<Driver | undefined>;
   getDrivers(): Promise<Driver[]>;
   getPendingDrivers(): Promise<Driver[]>;
   updateDriverStatus(id: number, status: string): Promise<Driver | undefined>;
-  updateDriverOnlineStatus(userId: string, isOnline: boolean): Promise<void>;
+  updateDriverOnlineStatus(userId: number, isOnline: boolean): Promise<void>;
   
   // Order operations
   createOrder(order: InsertOrder): Promise<Order>;
   getOrder(id: number): Promise<Order | undefined>;
   getOrderByTrackingNumber(trackingNumber: string): Promise<Order | undefined>;
-  getOrdersByCustomer(customerId: string): Promise<Order[]>;
-  getOrdersByDriver(driverId: string): Promise<Order[]>;
+  getOrdersByCustomer(customerId: number): Promise<Order[]>;
+  getOrdersByDriver(driverId: number): Promise<Order[]>;
   getAvailableOrders(): Promise<Order[]>;
-  updateOrderStatus(id: number, status: string, driverId?: string): Promise<Order | undefined>;
-  updateOrderDriverId(id: number, driverId: string): Promise<Order | undefined>;
+  updateOrderStatus(id: number, status: string, driverId?: number): Promise<Order | undefined>;
+  updateOrderDriverId(id: number, driverId: number): Promise<Order | undefined>;
   
   // Order status history operations
   addOrderStatusHistory(history: InsertOrderStatusHistory): Promise<OrderStatusHistory>;
@@ -65,23 +66,23 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  // User operations - required for Replit Auth
-  async getUser(id: string): Promise<User | undefined> {
+  // User operations - simple auth
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
+  async getUserByIdentifier(identifier: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(
+      sql`${users.email} = ${identifier} OR ${users.phoneNumber} = ${identifier}`
+    );
+    return user;
+  }
+
+  async createUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
       .returning();
     return user;
   }

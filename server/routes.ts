@@ -1,20 +1,91 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { getSession, isAuthenticated, hashPassword, verifyPassword } from "./auth";
+import { registerSchema, loginSchema } from "@shared/schema";
 import { insertOrderSchema, insertDriverSchema, insertDriverRatingSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+  // Session middleware
+  app.use(getSession());
 
   // Auth routes
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const validatedData = registerSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByIdentifier(
+        validatedData.email || validatedData.phoneNumber || ""
+      );
+      
+      if (existingUser) {
+        return res.status(409).json({ message: "Utilisateur déjà existant" });
+      }
+
+      // Hash password and create user
+      const hashedPassword = await hashPassword(validatedData.password);
+      const user = await storage.createUser({
+        ...validatedData,
+        password: hashedPassword,
+      });
+
+      res.status(201).json({ message: "Compte créé avec succès", userId: user.id });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      res.status(400).json({ message: "Erreur lors de l'inscription" });
+    }
+  });
+
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const validatedData = loginSchema.parse(req.body);
+      
+      // Find user by email or phone
+      const user = await storage.getUserByIdentifier(validatedData.identifier);
+      
+      if (!user || !(await verifyPassword(validatedData.password, user.password))) {
+        return res.status(401).json({ message: "Identifiants incorrects" });
+      }
+
+      // Set session
+      (req.session as any).userId = user.id;
+      
+      res.json({ 
+        message: "Connexion réussie", 
+        user: { 
+          id: user.id, 
+          firstName: user.firstName, 
+          lastName: user.lastName,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+          role: user.role 
+        } 
+      });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      res.status(400).json({ message: "Erreur lors de la connexion" });
+    }
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.session.destroy(() => {
+      res.json({ message: "Déconnexion réussie" });
+    });
+  });
+
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const user = req.user;
+      res.json({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        role: user.role
+      });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
