@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { Link } from "wouter";
 import { useState } from "react";
 
 export default function Navigation() {
   const { user, isAuthenticated } = useAuth();
+  const { startOnboarding } = useOnboarding();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -86,13 +88,24 @@ export default function Navigation() {
                 </Button>
               </div>
             ) : (
-              <Button 
-                onClick={() => window.location.href = "/auth/login"}
-                className="bg-mako-green text-white hover:bg-green-600"
-              >
-                <i className="fas fa-user mr-2"></i>
-                Se connecter
-              </Button>
+              <div className="flex items-center space-x-3">
+                <Button 
+                  onClick={startOnboarding}
+                  variant="outline"
+                  size="sm"
+                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white"
+                >
+                  <i className="fas fa-question-circle mr-2"></i>
+                  Guide
+                </Button>
+                <Button 
+                  onClick={() => window.location.href = "/auth/login"}
+                  className="bg-mako-green text-white hover:bg-green-600"
+                >
+                  <i className="fas fa-user mr-2"></i>
+                  Se connecter
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -148,6 +161,65 @@ export default function Navigation() {
                 >
                   <i className="fas fa-sign-out-alt mr-2"></i>
                   Déconnexion
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Menu mobile pour utilisateurs non connectés */}
+        {isMobileMenuOpen && !isAuthenticated && (
+          <div className="md:hidden bg-white border-t border-mako-silver">
+            <div className="px-4 py-2 space-y-1">
+              <Link 
+                href="/delivery/express" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-bolt mr-2"></i>
+                Livraison Express
+              </Link>
+              <Link 
+                href="/delivery/standard" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-truck mr-2"></i>
+                Livraison Standard
+              </Link>
+              <Link 
+                href="/tracking" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-map-marker-alt mr-2"></i>
+                Suivi de colis
+              </Link>
+              <Link 
+                href="/driver/register" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-motorcycle mr-2"></i>
+                Devenir Livreur
+              </Link>
+              <div className="border-t border-mako-silver pt-2 mt-2">
+                <button 
+                  onClick={() => {
+                    startOnboarding();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-mako-green hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                >
+                  <i className="fas fa-question-circle mr-2"></i>
+                  Guide d'utilisation
+                </button>
+                <button 
+                  onClick={() => window.location.href = "/auth/login"}
+                  className="block w-full text-left px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                >
+                  <i className="fas fa-user mr-2"></i>
+                  Se connecter
                 </button>
               </div>
             </div>
