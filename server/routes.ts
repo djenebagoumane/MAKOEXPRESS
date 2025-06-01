@@ -95,7 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Order routes
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const orderData = insertOrderSchema.parse({
         ...req.body,
         customerId: userId,
@@ -111,7 +111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/orders/my', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const orders = await storage.getOrdersByCustomer(userId);
       res.json(orders);
     } catch (error) {
@@ -181,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/drivers/profile', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const driver = await storage.getDriverByUserId(userId);
       res.json(driver);
     } catch (error) {
@@ -202,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/drivers/orders/my', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const orders = await storage.getOrdersByDriver(userId);
       res.json(orders);
     } catch (error) {
@@ -214,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/drivers/orders/:id/accept', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
 
       const order = await storage.updateOrderDriverId(Number(id), userId);
       if (!order) {
@@ -243,7 +243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/drivers/stats', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const stats = await storage.getDriverStats(userId);
       res.json(stats);
     } catch (error) {
@@ -255,7 +255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rating routes
   app.post('/api/ratings', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const ratingData = insertDriverRatingSchema.parse({
         ...req.body,
         customerId: userId,
