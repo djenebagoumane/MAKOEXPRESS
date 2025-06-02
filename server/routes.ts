@@ -622,61 +622,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test tracking endpoint with authentic Mali data
-  app.get("/api/test-tracking/:trackingNumber", async (req, res) => {
+  // Order matching system for drivers
+  app.get("/api/orders/available", async (req, res) => {
     try {
-      const { trackingNumber } = req.params;
+      // Get pending orders for driver matching
+      const availableOrders = [
+        {
+          id: 1,
+          trackingNumber: "MAKO001234",
+          pickupAddress: "Marché de Medina, Bamako, Mali",
+          deliveryAddress: "ACI 2000, Bamako, Mali",
+          packageType: "express",
+          weight: "0.5kg",
+          price: "2000 FCFA",
+          urgency: "express",
+          customerPhone: "+223 70 12 34 56",
+          customerName: "Mamadou Traoré",
+          status: "pending",
+          distance: 8.5,
+          estimatedTime: "25 minutes",
+          createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5 minutes ago
+          specialInstructions: "Appeler avant livraison"
+        },
+        {
+          id: 2,
+          trackingNumber: "MAKO001235",
+          pickupAddress: "Centre commercial, Sikasso, Mali",
+          deliveryAddress: "Université de Sikasso, Sikasso, Mali",
+          packageType: "standard",
+          weight: "2kg",
+          price: "3500 FCFA",
+          urgency: "standard",
+          customerPhone: "+223 65 78 90 12",
+          customerName: "Aissata Keita",
+          status: "pending",
+          distance: 12.3,
+          estimatedTime: "45 minutes",
+          createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 minutes ago
+          specialInstructions: null
+        },
+        {
+          id: 3,
+          trackingNumber: "MAKO001236",
+          pickupAddress: "Gare routière, Ségou, Mali",
+          deliveryAddress: "Marché central, Mopti, Mali",
+          packageType: "urgent",
+          weight: "1.2kg",
+          price: "4500 FCFA",
+          urgency: "urgent",
+          customerPhone: "+223 76 54 32 10",
+          customerName: "Ibrahim Diabaté",
+          status: "pending",
+          distance: 175.5,
+          estimatedTime: "3h 30min",
+          createdAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2 minutes ago
+          specialInstructions: "Livraison urgente - client attend sur place"
+        }
+      ];
       
-      const testOrder = {
-        id: 1,
-        trackingNumber: trackingNumber,
-        pickupAddress: "Marché de Medina, Bamako, Mali",
-        deliveryAddress: "ACI 2000, Bamako, Mali",
-        packageType: "express",
-        weight: "0.5kg",
-        price: "2000 FCFA",
-        status: "in_transit",
-        customerPhone: "+223 70 12 34 56",
-        driverId: "driver123",
-        paymentStatus: "paid",
-        paymentMethod: "cash",
-        estimatedDeliveryTime: "45 minutes",
-        statusHistory: [
-          {
-            id: 1,
-            status: "pending",
-            location: "Marché de Medina",
-            notes: "Commande créée",
-            timestamp: "2025-06-02T06:00:00Z"
-          },
-          {
-            id: 2, 
-            status: "accepted",
-            location: "Marché de Medina",
-            notes: "Livreur assigné",
-            timestamp: "2025-06-02T06:15:00Z"
-          },
-          {
-            id: 3,
-            status: "picked_up", 
-            location: "Marché de Medina",
-            notes: "Colis collecté",
-            timestamp: "2025-06-02T06:30:00Z"
-          },
-          {
-            id: 4,
-            status: "in_transit",
-            location: "En route vers ACI 2000",
-            notes: "Livraison en cours",
-            timestamp: "2025-06-02T06:45:00Z"
-          }
-        ]
+      res.json(availableOrders);
+    } catch (error) {
+      console.error("Available orders error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des commandes" });
+    }
+  });
+
+  // Accept order endpoint
+  app.post("/api/orders/:id/accept", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // In real implementation:
+      // 1. Check if order is still available
+      // 2. Assign driver to order
+      // 3. Update order status to "accepted"
+      // 4. Notify customer
+      
+      console.log(`Order ${id} accepted by driver`);
+      
+      res.json({ 
+        message: "Commande acceptée avec succès",
+        orderId: id,
+        status: "accepted"
+      });
+    } catch (error) {
+      console.error("Accept order error:", error);
+      res.status(500).json({ error: "Erreur lors de l'acceptation de la commande" });
+    }
+  });
+
+  // Decline order endpoint
+  app.post("/api/orders/:id/decline", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      console.log(`Order ${id} declined by driver`);
+      
+      res.json({ 
+        message: "Commande refusée",
+        orderId: id
+      });
+    } catch (error) {
+      console.error("Decline order error:", error);
+      res.status(500).json({ error: "Erreur lors du refus de la commande" });
+    }
+  });
+
+  // Cancel order endpoint (for customers)
+  app.post("/api/orders/:id/cancel", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Check if order can be cancelled (only if status is "pending")
+      // In real implementation, check order status from database
+      
+      console.log(`Order ${id} cancelled by customer`);
+      
+      res.json({ 
+        message: "Commande annulée avec succès",
+        orderId: id,
+        status: "cancelled"
+      });
+    } catch (error) {
+      console.error("Cancel order error:", error);
+      res.status(500).json({ error: "Erreur lors de l'annulation de la commande" });
+    }
+  });
+
+  // Customer order status endpoint
+  app.get("/api/orders/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Sample order status data
+      const orderStatus = {
+        id: parseInt(id),
+        status: "pending", // pending, accepted, picked_up, in_transit, delivered, cancelled
+        driverAssigned: false,
+        driverInfo: null,
+        canCancel: true, // Can only cancel if status is "pending"
+        lastUpdate: new Date().toISOString()
       };
       
-      res.json(testOrder);
+      res.json(orderStatus);
     } catch (error) {
-      console.error("Test tracking error:", error);
-      res.status(500).json({ error: "Erreur lors du test de suivi" });
+      console.error("Order status error:", error);
+      res.status(500).json({ error: "Erreur lors de la vérification du statut" });
     }
   });
 
