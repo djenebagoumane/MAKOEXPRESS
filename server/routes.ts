@@ -6,6 +6,7 @@ import { registerSchema, loginSchema } from "@shared/schema";
 import { insertOrderSchema, insertDriverSchema, insertDriverRatingSchema } from "@shared/schema";
 import { calculateCommission, getEquipmentTierInfo, canUpgradeToPremium, calculateMakoPayTransfer } from "./commissionCalculator";
 import { makoPayService } from "./makoPay";
+import { recommendationEngine } from "./recommendationEngine";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1567,146 +1568,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/recommendations", async (req, res) => {
+  app.get("/api/recommendations", isAuthenticated, async (req, res) => {
     try {
-      // Generate intelligent recommendations based on user patterns
-      const currentHour = new Date().getHours();
-      const recommendations = [
-        {
-          id: 1,
-          recommendationType: "time_suggestion",
-          title: "Meilleur moment pour livrer",
-          description: "Livraison 30% plus rapide entre 14h-16h aujourd'hui",
-          suggestedTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-          estimatedDuration: 32,
-          confidence: 0.89,
-          savings: {
-            timeSaved: 15,
-            moneySaved: 0,
-            reason: "Moins de trafic pendant cette période"
-          },
-          metadata: {
-            trafficLevel: "low",
-            weatherCondition: "favorable"
-          }
-        },
-        {
-          id: 2,
-          recommendationType: "route_optimization",
-          title: "Optimisation d'itinéraire",
-          description: "Combinez 2 livraisons pour économiser 25%",
-          estimatedPrice: 1875,
-          estimatedDuration: 38,
-          confidence: 0.76,
-          savings: {
-            timeSaved: 22,
-            moneySaved: 625,
-            reason: "Livraisons groupées dans la même zone"
-          }
-        },
-        {
-          id: 3,
-          recommendationType: "driver_match",
-          title: "Livreur recommandé",
-          description: "Amadou Traoré excelle dans votre quartier",
-          suggestedDriver: 1,
-          confidence: 0.93,
-          savings: {
-            timeSaved: 10,
-            moneySaved: 0,
-            reason: "Connaissance parfaite de la zone"
-          }
-        },
-        {
-          id: 4,
-          recommendationType: "price_optimization", 
-          title: "Économie sur le prix",
-          description: "Livraison standard au lieu d'express pour -40%",
-          estimatedPrice: 1500,
-          confidence: 0.67,
-          savings: {
-            timeSaved: 0,
-            moneySaved: 1000,
-            reason: "Délai non urgent détecté"
-          }
-        }
-      ];
+      const user = req.user as any;
+      const userId = user?.id?.toString() || "1";
       
-      // Filter recommendations based on current context
-      const relevantRecommendations = currentHour >= 13 && currentHour <= 17 
-        ? recommendations 
-        : recommendations.filter(r => r.recommendationType !== "time_suggestion");
+      // Get query parameters for current delivery request
+      const { pickupAddress, deliveryAddress, packageType, urgency } = req.query;
       
-      res.json(relevantRecommendations);
+      const currentRequest = {
+        pickupAddress: pickupAddress as string,
+        deliveryAddress: deliveryAddress as string,
+        packageType: packageType as string,
+        urgency: urgency as string
+      };
+
+      // Generate AI-powered recommendations
+      const recommendations = await recommendationEngine.generateRecommendations(
+        userId,
+        currentRequest
+      );
+      
+      res.json(recommendations);
     } catch (error) {
       console.error("Recommendations error:", error);
       res.status(500).json({ error: "Erreur lors de la génération des recommandations" });
     }
   });
 
-  app.post("/api/recommendations/generate", async (req, res) => {
+  app.post("/api/recommendations/generate", isAuthenticated, async (req, res) => {
     try {
+      const user = req.user as any;
+      const userId = user?.id?.toString() || "1";
       const { pickupAddress, deliveryAddress, packageType, urgency } = req.body;
       
-      // AI-powered recommendation generation based on context
-      const contextualRecommendations = [];
-      
-      // Route optimization based on addresses
-      if (pickupAddress && deliveryAddress) {
-        contextualRecommendations.push({
-          id: Date.now(),
-          recommendationType: "route_optimization",
-          title: "Itinéraire optimisé détecté",
-          description: "Trajet direct sans détours recommandé",
-          suggestedPickupAddress: pickupAddress,
-          suggestedDeliveryAddress: deliveryAddress,
-          estimatedDuration: 28,
-          confidence: 0.84,
-          savings: {
-            timeSaved: 12,
-            moneySaved: 0,
-            reason: "Route directe disponible"
-          }
-        });
-      }
+      const currentRequest = {
+        pickupAddress,
+        deliveryAddress,
+        packageType,
+        urgency
+      };
 
-      // Time-based suggestions
-      const currentHour = new Date().getHours();
-      if (currentHour >= 11 && currentHour <= 13) {
-        contextualRecommendations.push({
-          id: Date.now() + 1,
-          recommendationType: "time_suggestion",
-          title: "Éviter l'heure de pointe",
-          description: "Livraison recommandée après 14h pour éviter les embouteillages",
-          suggestedTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
-          confidence: 0.78,
-          savings: {
-            timeSaved: 18,
-            moneySaved: 0,
-            reason: "Trafic dense pendant l'heure de déjeuner"
-          }
-        });
-      }
-
-      // Package type optimization
-      if (packageType === "documents") {
-        contextualRecommendations.push({
-          id: Date.now() + 2,
-          recommendationType: "driver_match",
-          title: "Spécialiste documents",
-          description: "Livreur expert pour documents disponible",
-          confidence: 0.91,
-          savings: {
-            timeSaved: 8,
-            moneySaved: 0,
-            reason: "Expérience avec documents sensibles"
-          }
-        });
-      }
+      // Generate context-aware recommendations using AI engine
+      const recommendations = await recommendationEngine.generateRecommendations(
+        userId,
+        currentRequest
+      );
 
       res.json({
         message: "Nouvelles recommandations générées",
-        recommendations: contextualRecommendations
+        recommendations
       });
     } catch (error) {
       console.error("Generate recommendations error:", error);
@@ -1714,11 +1625,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/recommendations/:id/accept", async (req, res) => {
+  app.post("/api/recommendations/:id/accept", isAuthenticated, async (req, res) => {
     try {
+      const user = req.user as any;
+      const userId = user?.id?.toString() || "1";
       const { id } = req.params;
       
-      // Track recommendation acceptance for learning
+      // Track recommendation acceptance for ML learning
+      await recommendationEngine.trackRecommendationAcceptance(userId, id, true);
+      
       res.json({
         message: "Recommandation acceptée",
         recommendationId: id,
@@ -1730,11 +1645,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/recommendations/:id/dismiss", async (req, res) => {
+  app.post("/api/recommendations/:id/dismiss", isAuthenticated, async (req, res) => {
     try {
+      const user = req.user as any;
+      const userId = user?.id?.toString() || "1";
       const { id } = req.params;
       
-      // Track recommendation dismissal for learning
+      // Track recommendation dismissal for ML learning
+      await recommendationEngine.trackRecommendationAcceptance(userId, id, false);
+      
       res.json({
         message: "Recommandation ignorée",
         recommendationId: id
@@ -1742,6 +1661,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Dismiss recommendation error:", error);
       res.status(500).json({ error: "Erreur lors du rejet de la recommandation" });
+    }
+  });
+
+  app.get("/api/user/delivery-patterns", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const userId = user?.id?.toString() || "1";
+      
+      // Analyze user delivery patterns
+      const patterns = await recommendationEngine.analyzeUserPatterns(userId);
+      
+      res.json(patterns);
+    } catch (error) {
+      console.error("Delivery patterns error:", error);
+      res.status(500).json({ error: "Erreur lors de l'analyse des habitudes" });
     }
   });
 
