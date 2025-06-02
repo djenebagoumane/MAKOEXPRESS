@@ -108,32 +108,33 @@
 }
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 12%; /* Gris Anthracite #1E1E1E */
-  --muted: 0 0% 96%; /* Gris Clair #F5F5F5 */
-  --muted-foreground: 0 0% 12%;
+  --background: 0 0% 98%; /* Blanc cassé pour réduire l'éblouissement */
+  --foreground: 0 0% 15%; /* Gris foncé plus doux */
+  --muted: 177 20% 95%; /* Légère teinte verte */
+  --muted-foreground: 0 0% 25%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 12%;
+  --popover-foreground: 0 0% 15%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 12%;
-  --border: 0 0% 96%;
-  --input: 0 0% 96%;
+  --card-foreground: 0 0% 15%;
+  --border: 177 15% 90%; /* Bordures avec teinte verte subtile */
+  --input: 177 15% 96%;
   --primary: 177 100% 27%; /* Vert MAKO #008C6F */
   --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 96%; /* Gris Clair #F5F5F5 */
-  --secondary-foreground: 0 0% 12%;
-  --accent: 0 0% 96%;
-  --accent-foreground: 0 0% 12%;
+  --secondary: 177 20% 94%; /* Gris avec teinte verte */
+  --secondary-foreground: 0 0% 15%;
+  --accent: 177 25% 92%;
+  --accent-foreground: 0 0% 15%;
   --destructive: 0 66% 56%; /* Erreur #E53935 */
   --destructive-foreground: 0 0% 100%;
   --ring: 177 100% 27%;
   --radius: 0.5rem;
   --mako-green: 177 100% 27%; /* Vert MAKO #008C6F */
   --mako-jade: 177 98% 29%; /* Vert Jade Clair #00A88E */
-  --mako-deep: 177 100% 16%; /* Vert Profond #004D3F */
+  --mako-deep: 177 100% 20%; /* Vert Profond plus visible */
   --mako-white: 0 0% 100%; /* Blanc Pur #FFFFFF */
-  --mako-anthracite: 0 0% 12%; /* Gris Anthracite #1E1E1E */
-  --mako-light: 0 0% 96%; /* Gris Clair #F5F5F5 */
+  --mako-anthracite: 0 0% 15%; /* Gris plus doux */
+  --mako-light: 177 20% 96%; /* Gris avec teinte verte */
+  --mako-silver: 177 10% 85%; /* Argent avec teinte verte */
   --mako-success: 142 76% 52%; /* Succès #4CAF50 */
   --mako-error: 0 66% 56%; /* Erreur #E53935 */
   --mako-info: 207 90% 54%; /* Information #2196F3 */

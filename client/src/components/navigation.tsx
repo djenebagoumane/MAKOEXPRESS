@@ -10,23 +10,23 @@ export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-sm border-b border-mako-silver fixed w-full top-0 z-50">
+    <header className="bg-gradient-to-r from-mako-green to-mako-jade shadow-lg fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
             <div className="bg-mako-green rounded-lg p-2">
               <i className="fas fa-truck text-white text-lg sm:text-xl"></i>
             </div>
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-mako-dark truncate">MAKOEXPRESS</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white truncate">MAKOEXPRESS</h1>
           </Link>
           
           {isAuthenticated && (
             <nav className="hidden md:flex space-x-6">
-              <Link href="/" className="text-mako-anthracite hover:text-mako-green transition-colors">
+              <Link href="/" className="text-white hover:text-mako-light transition-colors">
                 Accueil
               </Link>
               <div className="relative group">
-                <span className="text-mako-anthracite hover:text-mako-green transition-colors cursor-pointer">
+                <span className="text-white hover:text-mako-light transition-colors cursor-pointer">
                   Livraison
                   <i className="fas fa-chevron-down ml-1 text-xs"></i>
                 </span>
@@ -41,24 +41,22 @@ export default function Navigation() {
                   </Link>
                 </div>
               </div>
-              <Link href="/tracking" className="text-mako-anthracite hover:text-mako-green transition-colors">
+              <Link href="/tracking" className="text-white hover:text-mako-light transition-colors">
                 <i className="fas fa-search mr-1"></i>
                 Suivi de Colis
               </Link>
-              <Link href="/ai-recommendations" className="text-mako-anthracite hover:text-mako-green transition-colors">
+              <Link href="/ai-recommendations" className="text-white hover:text-mako-light transition-colors">
                 <i className="fas fa-brain mr-1"></i>
                 Recommandations IA
               </Link>
-              <Link href="/driver/register" className="text-mako-anthracite hover:text-mako-green transition-colors">
+              <Link href="/driver/register" className="text-white hover:text-mako-light transition-colors">
                 <i className="fas fa-motorcycle mr-1"></i>
                 Devenir Livreur
               </Link>
-              {user?.role === 'admin' && (
-                <Link href="/admin" className="text-mako-anthracite hover:text-mako-green transition-colors">
-                  <i className="fas fa-cog mr-1"></i>
-                  Admin
-                </Link>
-              )}
+              <Link href="/admin" className="text-white hover:text-mako-light transition-colors">
+                <i className="fas fa-cog mr-1"></i>
+                Admin
+              </Link>
             </nav>
           )}
           
@@ -77,7 +75,7 @@ export default function Navigation() {
                   <div className="w-8 h-8 rounded-full bg-mako-green flex items-center justify-center">
                     <i className="fas fa-user text-white text-sm"></i>
                   </div>
-                  <span className="text-sm text-mako-anthracite">
+                  <span className="text-sm text-white">
                     Utilisateur
                   </span>
                 </div>
