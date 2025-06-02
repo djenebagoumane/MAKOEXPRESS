@@ -10,14 +10,14 @@ export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-gradient-to-r from-mako-green to-mako-jade shadow-lg fixed w-full top-0 z-50">
+    <header className="bg-gradient-to-r from-mako-dark to-mako-green shadow-lg fixed w-full top-0 z-50 border-b-2 border-mako-orange">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-            <div className="bg-white rounded-lg p-2 shadow-sm">
-              <i className="fas fa-truck text-mako-green text-lg sm:text-xl"></i>
+            <div className="bg-mako-orange rounded-lg p-2 shadow-sm">
+              <i className="fas fa-truck text-white text-lg sm:text-xl"></i>
             </div>
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white truncate">MAKOEXPRESS</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white truncate drop-shadow-md">MAKOEXPRESS</h1>
           </Link>
           
           {isAuthenticated && (
