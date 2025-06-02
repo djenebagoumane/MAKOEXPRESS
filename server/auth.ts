@@ -27,7 +27,7 @@ export function getSession() {
   });
 }
 
-export const isAuthenticated: RequestHandler = async (req, res, next) => {
+export const isCustomAuthenticated: RequestHandler = async (req, res, next) => {
   if (!req.session?.userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { getSession, isAuthenticated, hashPassword, verifyPassword } from "./auth";
+import { setupCustomAuth, isCustomAuthenticated } from "./customAuth";
 import { registerSchema, loginSchema } from "@shared/schema";
 import { insertOrderSchema, insertDriverSchema, insertDriverRatingSchema } from "@shared/schema";
 import { calculateCommission, getEquipmentTierInfo, canUpgradeToPremium, calculateMakoPayTransfer } from "./commissionCalculator";
@@ -10,75 +10,10 @@ import { recommendationEngine } from "./recommendationEngine";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session middleware
-  app.use(getSession());
+  // Custom Auth setup
+  await setupCustomAuth(app);
 
-  // Auth routes
-  app.post('/api/auth/register', async (req, res) => {
-    try {
-      const validatedData = registerSchema.parse(req.body);
-      
-      // Check if user already exists
-      const existingUser = await storage.getUserByIdentifier(
-        validatedData.email || validatedData.phoneNumber || ""
-      );
-      
-      if (existingUser) {
-        return res.status(409).json({ message: "Utilisateur déjà existant" });
-      }
-
-      // Hash password and create user
-      const hashedPassword = await hashPassword(validatedData.password);
-      const user = await storage.createUser({
-        ...validatedData,
-        password: hashedPassword,
-      });
-
-      res.status(201).json({ message: "Compte créé avec succès", userId: user.id });
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      res.status(400).json({ message: "Erreur lors de l'inscription" });
-    }
-  });
-
-  app.post('/api/auth/login', async (req, res) => {
-    try {
-      const validatedData = loginSchema.parse(req.body);
-      
-      // Find user by email or phone
-      const user = await storage.getUserByIdentifier(validatedData.identifier);
-      
-      if (!user || !(await verifyPassword(validatedData.password, user.password))) {
-        return res.status(401).json({ message: "Identifiants incorrects" });
-      }
-
-      // Set session
-      (req.session as any).userId = user.id;
-      
-      res.json({ 
-        message: "Connexion réussie", 
-        user: { 
-          id: user.id, 
-          firstName: user.firstName, 
-          lastName: user.lastName,
-          email: user.email,
-          phoneNumber: user.phoneNumber,
-          role: user.role 
-        } 
-      });
-    } catch (error: any) {
-      console.error("Login error:", error);
-      res.status(400).json({ message: "Erreur lors de la connexion" });
-    }
-  });
-
-  app.post('/api/auth/logout', (req, res) => {
-    req.session.destroy(() => {
-      res.json({ message: "Déconnexion réussie" });
-    });
-  });
-
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', isCustomAuthenticated, async (req: any, res) => {
     try {
       const user = req.user;
       res.json({
@@ -96,7 +31,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Order routes
-  app.post('/api/orders', isAuthenticated, async (req: any, res) => {
+  app.post('/api/orders', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const orderData = insertOrderSchema.parse({
@@ -112,7 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/orders/my', isAuthenticated, async (req: any, res) => {
+  app.get('/api/orders/my', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const orders = await storage.getOrdersByCustomer(userId);
@@ -140,7 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/orders/:id/status', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/orders/:id/status', isCustomAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const { status } = req.body;
@@ -370,7 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/drivers/orders/available', isAuthenticated, async (req: any, res) => {
+  app.get('/api/drivers/orders/available', isCustomAuthenticated, async (req: any, res) => {
     try {
       const orders = await storage.getAvailableOrders();
       res.json(orders);
@@ -380,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/drivers/orders/my', isAuthenticated, async (req: any, res) => {
+  app.get('/api/drivers/orders/my', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const orders = await storage.getOrdersByDriver(userId);
@@ -391,7 +326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/drivers/orders/:id/accept', isAuthenticated, async (req: any, res) => {
+  app.post('/api/drivers/orders/:id/accept', isCustomAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user.id;
@@ -408,7 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/drivers/online-status', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/drivers/online-status', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { isOnline } = req.body;
@@ -421,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/drivers/stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/drivers/stats', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const stats = await storage.getDriverStats(userId);
@@ -433,7 +368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User account and transaction routes
-  app.patch('/api/user/profile', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/user/profile', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const updateData = req.body;
@@ -452,7 +387,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/transactions/my', isAuthenticated, async (req: any, res) => {
+  app.get('/api/transactions/my', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       
@@ -494,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/user/preferences', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const preferences = req.body;
@@ -510,7 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Rating routes
-  app.post('/api/ratings', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ratings', isCustomAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const ratingData = insertDriverRatingSchema.parse({
@@ -527,7 +462,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes
-  app.get('/api/admin/drivers/pending', isAuthenticated, async (req: any, res) => {
+  app.get('/api/admin/drivers/pending', isCustomAuthenticated, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user.claims.sub);
       if (user?.role !== 'admin') {
@@ -542,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/admin/drivers/:id/status', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/admin/drivers/:id/status', isCustomAuthenticated, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user.claims.sub);
       if (user?.role !== 'admin') {
@@ -564,7 +499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/admin/stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/admin/stats', isCustomAuthenticated, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user.claims.sub);
       if (user?.role !== 'admin') {
@@ -1645,7 +1580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/recommendations", isAuthenticated, async (req, res) => {
+  app.get("/api/recommendations", isCustomAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const userId = user?.id?.toString() || "1";
@@ -1673,7 +1608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/recommendations/generate", isAuthenticated, async (req, res) => {
+  app.post("/api/recommendations/generate", isCustomAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const userId = user?.id?.toString() || "1";
@@ -1702,7 +1637,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/recommendations/:id/accept", isAuthenticated, async (req, res) => {
+  app.post("/api/recommendations/:id/accept", isCustomAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const userId = user?.id?.toString() || "1";
@@ -1722,7 +1657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/recommendations/:id/dismiss", isAuthenticated, async (req, res) => {
+  app.post("/api/recommendations/:id/dismiss", isCustomAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const userId = user?.id?.toString() || "1";
@@ -1741,7 +1676,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/user/delivery-patterns", isAuthenticated, async (req, res) => {
+  app.get("/api/user/delivery-patterns", isCustomAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const userId = user?.id?.toString() || "1";
