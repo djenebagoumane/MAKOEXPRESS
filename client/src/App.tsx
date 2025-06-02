@@ -41,6 +41,9 @@ function Router() {
           <Route path="/delivery/standard" component={DeliveryStandard} />
           <Route path="/delivery" component={DeliveryForm} />
           <Route path="/driver/register" component={BecomeDriver} />
+          <Route path="/driver/orders" component={OrderRequests} />
+          <Route path="/customer/orders" component={CustomerOrders} />
+          <Route path="/auth/forgot-password" component={ForgotPassword} />
           <Route path="/help" component={HelpCenter} />
           <Route path="/contact" component={Contact} />
           <Route path="/terms" component={TermsOfService} />
