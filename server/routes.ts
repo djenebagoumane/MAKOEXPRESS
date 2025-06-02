@@ -962,6 +962,254 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return data;
   }
 
+  // Driver wallet endpoints
+  app.get("/api/drivers/wallet", async (req, res) => {
+    try {
+      // Simulate driver wallet data
+      const walletData = {
+        balance: "12750.00",
+        totalEarnings: "45200.00",
+        totalWithdrawn: "32450.00",
+        makoPayId: "+223 70 12 34 56"
+      };
+      
+      res.json(walletData);
+    } catch (error) {
+      console.error("Wallet error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération du portefeuille" });
+    }
+  });
+
+  app.get("/api/drivers/transactions", async (req, res) => {
+    try {
+      // Simulate transaction history
+      const transactions = [
+        {
+          id: 1,
+          type: "commission",
+          amount: "1600.00",
+          driverPortion: "1600.00",
+          description: "Commission livraison #MAKO001234",
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: 2,
+          type: "withdrawal",
+          amount: "5000.00",
+          driverPortion: "5000.00",
+          description: "Retrait vers MakoPay",
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: 3,
+          type: "commission",
+          amount: "2400.00",
+          driverPortion: "2400.00",
+          description: "Commission livraison #MAKO001235",
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      ];
+      
+      res.json(transactions);
+    } catch (error) {
+      console.error("Transactions error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des transactions" });
+    }
+  });
+
+  app.get("/api/drivers/withdrawals", async (req, res) => {
+    try {
+      // Simulate withdrawal requests
+      const withdrawalRequests = [
+        {
+          id: 1,
+          amount: "5000.00",
+          makoPayAccount: "+223 70 12 34 56",
+          status: "completed",
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          processedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: 2,
+          amount: "3000.00",
+          makoPayAccount: "+223 70 12 34 56",
+          status: "pending",
+          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      ];
+      
+      res.json(withdrawalRequests);
+    } catch (error) {
+      console.error("Withdrawals error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des demandes de retrait" });
+    }
+  });
+
+  app.post("/api/drivers/withdrawal-request", async (req, res) => {
+    try {
+      const { amount, makoPayAccount } = req.body;
+      
+      // Validate withdrawal request
+      if (!amount || !makoPayAccount) {
+        return res.status(400).json({ error: "Montant et compte MakoPay requis" });
+      }
+
+      if (Number(amount) < 1000) {
+        return res.status(400).json({ error: "Montant minimum : 1,000 FCFA" });
+      }
+
+      // Simulate MakoPay integration
+      const newRequest = {
+        id: Date.now(),
+        amount,
+        makoPayAccount,
+        status: "pending",
+        createdAt: new Date().toISOString()
+      };
+
+      res.json({
+        message: "Demande de retrait enregistrée",
+        request: newRequest
+      });
+    } catch (error) {
+      console.error("Withdrawal request error:", error);
+      res.status(500).json({ error: "Erreur lors de la demande de retrait" });
+    }
+  });
+
+  // Admin panel endpoints
+  app.get("/api/admin/dashboard", async (req, res) => {
+    try {
+      // Simulate admin dashboard data
+      const dashboardData = {
+        totalCommissions: "156750.00",
+        todayCommissions: "8400.00",
+        totalOrders: 425,
+        activeDrivers: 12,
+        pendingWithdrawals: 3,
+        totalRevenue: "783750.00",
+        monthlyGrowth: 18.5,
+        topDrivers: [
+          { name: "Amadou Traoré", earnings: "45200.00", orders: 86 },
+          { name: "Fatoumata Diallo", earnings: "38750.00", orders: 72 },
+          { name: "Ibrahim Koné", earnings: "32100.00", orders: 65 }
+        ],
+        recentTransactions: [
+          {
+            id: 1,
+            orderId: "MAKO001234",
+            customer: "Mariam Sidibé",
+            driver: "Amadou Traoré",
+            amount: "2000.00",
+            commission: "400.00",
+            date: new Date().toISOString()
+          }
+        ]
+      };
+      
+      res.json(dashboardData);
+    } catch (error) {
+      console.error("Admin dashboard error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des données admin" });
+    }
+  });
+
+  app.get("/api/admin/withdrawals", async (req, res) => {
+    try {
+      // Simulate pending withdrawal requests for admin approval
+      const pendingWithdrawals = [
+        {
+          id: 1,
+          driverName: "Amadou Traoré",
+          driverPhone: "+223 70 12 34 56",
+          amount: "8500.00",
+          makoPayAccount: "+223 70 12 34 56",
+          requestDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          status: "pending"
+        },
+        {
+          id: 2,
+          driverName: "Fatoumata Diallo",
+          driverPhone: "+223 75 98 76 54",
+          amount: "12000.00",
+          makoPayAccount: "+223 75 98 76 54",
+          requestDate: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+          status: "pending"
+        }
+      ];
+      
+      res.json(pendingWithdrawals);
+    } catch (error) {
+      console.error("Admin withdrawals error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des demandes de retrait" });
+    }
+  });
+
+  app.post("/api/admin/approve-withdrawal/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Simulate MakoPay transfer process
+      const transferResult = {
+        success: true,
+        transactionId: `TXN_${Date.now()}`,
+        message: "Transfert MakoPay effectué avec succès"
+      };
+
+      res.json({
+        message: "Retrait approuvé et transféré",
+        transfer: transferResult
+      });
+    } catch (error) {
+      console.error("Approve withdrawal error:", error);
+      res.status(500).json({ error: "Erreur lors de l'approbation du retrait" });
+    }
+  });
+
+  app.post("/api/admin/reject-withdrawal/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+      
+      res.json({
+        message: "Retrait rejeté",
+        reason: reason || "Non spécifié"
+      });
+    } catch (error) {
+      console.error("Reject withdrawal error:", error);
+      res.status(500).json({ error: "Erreur lors du rejet du retrait" });
+    }
+  });
+
+  // MakoPay payment simulation
+  app.post("/api/payments/makopay", async (req, res) => {
+    try {
+      const { orderId, amount, customerPhone, driverPhone } = req.body;
+      
+      // Calculate commission (20% for admin)
+      const totalAmount = Number(amount);
+      const adminCommission = totalAmount * 0.20;
+      const driverPortion = totalAmount * 0.80;
+
+      // Simulate MakoPay payment processing
+      const paymentResult = {
+        success: true,
+        transactionId: `MAKO_PAY_${Date.now()}`,
+        orderId,
+        totalAmount: totalAmount.toFixed(2),
+        adminCommission: adminCommission.toFixed(2),
+        driverPortion: driverPortion.toFixed(2),
+        status: "completed",
+        processedAt: new Date().toISOString()
+      };
+
+      res.json(paymentResult);
+    } catch (error) {
+      console.error("MakoPay payment error:", error);
+      res.status(500).json({ error: "Erreur lors du paiement MakoPay" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
