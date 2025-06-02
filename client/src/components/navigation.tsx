@@ -45,6 +45,10 @@ export default function Navigation() {
                 <i className="fas fa-search mr-1"></i>
                 Suivi de Colis
               </Link>
+              <Link href="/ai-recommendations" className="text-mako-anthracite hover:text-mako-green transition-colors">
+                <i className="fas fa-brain mr-1"></i>
+                Recommandations IA
+              </Link>
               <Link href="/driver/register" className="text-mako-anthracite hover:text-mako-green transition-colors">
                 <i className="fas fa-motorcycle mr-1"></i>
                 Devenir Livreur

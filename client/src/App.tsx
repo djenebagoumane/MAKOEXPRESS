@@ -26,6 +26,7 @@ import ForgotPassword from "@/pages/auth/forgot-password";
 import OrderRequests from "@/pages/order-requests";
 import CustomerOrders from "@/pages/customer-orders";
 import SmartRecommendations from "@/pages/smart-recommendations";
+import AIRecommendations from "@/pages/ai-recommendations";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -72,6 +73,7 @@ function Router() {
           <Route path="/driver/orders" component={OrderRequests} />
           <Route path="/customer/orders" component={CustomerOrders} />
           <Route path="/smart-recommendations" component={SmartRecommendations} />
+          <Route path="/ai-recommendations" component={AIRecommendations} />
         </>
       )}
       <Route component={NotFound} />
