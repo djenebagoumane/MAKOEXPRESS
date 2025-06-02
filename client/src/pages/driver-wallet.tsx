@@ -13,6 +13,8 @@ import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import MobileNav from "@/components/mobile-nav";
+import QuickWithdrawalWidget from "@/components/quick-withdrawal-widget";
+import AnimatedWalletHistory from "@/components/animated-wallet-history";
 
 const withdrawalSchema = z.object({
   amount: z.string().min(1, "Montant requis"),
@@ -146,9 +148,18 @@ export default function DriverWallet() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
+          {/* Quick Withdrawal Widget */}
+          <div className="lg:col-span-1">
+            <QuickWithdrawalWidget
+              walletBalance={Number(walletData?.balance || 0)}
+              makoPayAccount="+223 70 12 34 56"
+              className="mb-6"
+            />
+          </div>
+
           {/* Wallet Summary */}
-          <div className="lg:col-span-3">
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2">
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
               {/* Current Balance */}
               <Card className="border-green-200 bg-gradient-to-br from-green-50 to-green-100">
                 <CardHeader className="pb-3">
@@ -167,7 +178,7 @@ export default function DriverWallet() {
                     disabled={!walletData?.balance || Number(walletData.balance) < 1000}
                   >
                     <i className="fas fa-download mr-2"></i>
-                    Retirer vers MakoPay
+                    Retrait Standard
                   </Button>
                   {Number(walletData?.balance || 0) < 1000 && (
                     <p className="text-xs text-green-700 mt-2">
@@ -359,8 +370,53 @@ export default function DriverWallet() {
             </Card>
           </div>
 
-          {/* Recent Transactions */}
-          <div className="lg:col-span-1">
+          {/* Animated Wallet History */}
+          <div className="lg:col-span-3">
+            <AnimatedWalletHistory
+              transactions={[
+                {
+                  id: "1",
+                  type: "earning",
+                  amount: 2500,
+                  description: "Livraison Commande #ORD-001",
+                  timestamp: new Date().toISOString(),
+                  status: "completed",
+                  orderId: "ORD-001",
+                  fromUser: "Aminata Traoré",
+                  toDestination: "Portefeuille"
+                },
+                {
+                  id: "2",
+                  type: "withdrawal",
+                  amount: 5000,
+                  description: "Retrait vers MakoPay",
+                  timestamp: new Date(Date.now() - 86400000).toISOString(),
+                  status: "completed",
+                  toDestination: "+223 70 12 34 56"
+                },
+                {
+                  id: "3",
+                  type: "bonus",
+                  amount: 1000,
+                  description: "Badge Excellence débloqué",
+                  timestamp: new Date(Date.now() - 172800000).toISOString(),
+                  status: "completed"
+                },
+                {
+                  id: "4",
+                  type: "commission",
+                  amount: 500,
+                  description: "Commission Admin (20%)",
+                  timestamp: new Date(Date.now() - 259200000).toISOString(),
+                  status: "completed",
+                  orderId: "ORD-002"
+                }
+              ]}
+            />
+          </div>
+
+          {/* Recent Transactions - Simple List */}
+          <div className="lg:col-span-1 hidden">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">

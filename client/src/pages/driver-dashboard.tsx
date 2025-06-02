@@ -9,6 +9,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import MobileNav from "@/components/mobile-nav";
+import DriverAchievementBadges from "@/components/driver-achievement-badges";
 import DeliveryCard from "@/components/delivery-card";
 import VoiceAssistantPanel from "@/components/voice-assistant-panel";
 import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
