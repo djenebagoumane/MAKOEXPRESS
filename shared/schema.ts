@@ -25,18 +25,21 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table - simple auth with phone or email
+// User storage table - auth with email and phone by country
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  email: varchar("email").unique(),
-  phoneNumber: varchar("phone_number").unique(),
+  email: varchar("email").notNull().unique(),
+  phoneNumber: varchar("phone_number").notNull().unique(),
+  countryCode: varchar("country_code").notNull(), // +223, +33, etc
+  country: varchar("country").notNull(), // Mali, France, etc
   firstName: varchar("first_name").notNull(),
   lastName: varchar("last_name").notNull(),
   password: varchar("password").notNull(),
   profileImageUrl: varchar("profile_image_url"),
   address: text("address"),
   role: varchar("role").notNull().default("customer"), // customer, driver, admin
-  isVerified: boolean("is_verified").default(false),
+  isEmailVerified: boolean("is_email_verified").default(false),
+  isPhoneVerified: boolean("is_phone_verified").default(false),
   verificationCode: varchar("verification_code"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -292,12 +295,11 @@ export const driverRatingsRelations = relations(driverRatings, ({ one }) => ({
 export const registerSchema = z.object({
   firstName: z.string().min(1, "Le prénom est requis"),
   lastName: z.string().min(1, "Le nom est requis"),
-  email: z.string().email("Email invalide").optional(),
-  phoneNumber: z.string().min(8, "Numéro de téléphone invalide").optional(),
+  email: z.string().email("Email invalide"),
+  phoneNumber: z.string().min(8, "Numéro de téléphone invalide"),
+  countryCode: z.string().min(1, "Code pays requis"),
+  country: z.string().min(1, "Pays requis"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-}).refine(data => data.email || data.phoneNumber, {
-  message: "Email ou numéro de téléphone requis",
-  path: ["email"]
 });
 
 export const loginSchema = z.object({

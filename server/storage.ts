@@ -19,7 +19,7 @@ import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations - simple auth
+  // User operations - email/phone auth
   getUser(id: number): Promise<User | undefined>;
   getUserByIdentifier(identifier: string): Promise<User | undefined>;
   createUser(user: UpsertUser): Promise<User>;
