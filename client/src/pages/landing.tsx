@@ -36,7 +36,7 @@ export default function Landing() {
                   <Button 
                     onClick={() => window.location.href = "/driver/register"}
                     variant="outline"
-                    className="border-2 border-white text-white h-12 px-4 sm:px-6 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center text-sm touch-manipulation"
+                    className="bg-white text-mako-green h-12 px-4 sm:px-6 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center text-sm touch-manipulation"
                   >
                     <i className="fas fa-motorcycle mr-2"></i>
                     Devenir livreur
@@ -44,7 +44,7 @@ export default function Landing() {
                   <Button 
                     onClick={startOnboarding}
                     variant="outline"
-                    className="border-2 border-yellow-400 text-yellow-400 h-12 px-4 sm:px-6 rounded-xl font-semibold hover:bg-yellow-400 hover:text-mako-anthracite transition-colors flex items-center justify-center text-sm touch-manipulation"
+                    className="border-2 border-yellow-400 text-yellow-400 h-12 px-4 sm:px-6 rounded-xl font-semibold hover:bg-yellow-400 hover:text-mako-green transition-colors flex items-center justify-center text-sm touch-manipulation"
                   >
                     <i className="fas fa-question-circle mr-2"></i>
                     Guide
@@ -53,7 +53,7 @@ export default function Landing() {
                 <Button 
                   onClick={() => window.location.href = "/auth/login"}
                   variant="outline"
-                  className="border-2 border-white text-white h-12 sm:h-14 px-6 sm:px-8 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center text-sm sm:text-base touch-manipulation"
+                  className="bg-white text-mako-green  h-12 sm:h-14 px-6 sm:px-8 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center text-sm sm:text-base touch-manipulation"
                 >
                   <i className="fas fa-user mr-2"></i>
                   Se connecter

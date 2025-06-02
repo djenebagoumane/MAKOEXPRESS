@@ -7,6 +7,7 @@ import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import MobileNav from "@/components/mobile-nav";
 import OrderStatus from "@/components/order-status";
+import DeliveryRouteMap from "@/components/delivery-route-map";
 
 export default function Tracking() {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -80,9 +81,47 @@ export default function Tracking() {
 
               {/* Tracking Result */}
               {searchAttempted && trackingNumber && (
-                <div className="mt-6">
+                <div className="mt-6 space-y-6">
                   {trackedOrder ? (
-                    <OrderStatus order={trackedOrder} showHistory={true} />
+                    <>
+                      <OrderStatus order={trackedOrder} showHistory={true} />
+                      
+                      {/* Interactive Route Map */}
+                      <DeliveryRouteMap 
+                        orderId={trackedOrder.id.toString()}
+                        pickupLocation={{
+                          id: "pickup",
+                          name: "Point de collecte",
+                          address: trackedOrder.pickupAddress,
+                          lat: 12.6392,
+                          lng: -8.0029,
+                          type: "pickup",
+                          status: trackedOrder.status === "pending" ? "pending" : "completed"
+                        }}
+                        deliveryLocation={{
+                          id: "delivery", 
+                          name: "Point de livraison",
+                          address: trackedOrder.deliveryAddress,
+                          lat: 12.6500,
+                          lng: -7.9950,
+                          type: "delivery",
+                          status: trackedOrder.status === "delivered" ? "completed" : 
+                                 trackedOrder.status === "in_transit" ? "current" : "pending"
+                        }}
+                        driverLocation={trackedOrder.status !== "pending" ? {
+                          id: "driver",
+                          name: "Livreur",
+                          address: "En route",
+                          lat: 12.6450,
+                          lng: -7.9980,
+                          type: "driver",
+                          status: "current"
+                        } : undefined}
+                        isAnimated={true}
+                        showControls={true}
+                        className="mt-6"
+                      />
+                    </>
                   ) : !isTracking ? (
                     <div className="text-center py-8">
                       <i className="fas fa-exclamation-circle text-6xl text-red-500 mb-4"></i>

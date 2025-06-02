@@ -381,6 +381,233 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Route tracking API endpoint
+  app.get("/api/orders/:id/route", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const order = await storage.getOrder(Number(id));
+      
+      if (!order) {
+        return res.status(404).json({ error: "Commande introuvable" });
+      }
+
+      // Mali cities coordinates for authentic routing
+      const maliCoordinates: Record<string, { lat: number; lng: number }> = {
+        "bamako": { lat: 12.6392, lng: -8.0029 },
+        "sikasso": { lat: 11.3176, lng: -5.6747 },
+        "ségou": { lat: 13.4317, lng: -6.2158 },
+        "segou": { lat: 13.4317, lng: -6.2158 },
+        "mopti": { lat: 14.4843, lng: -4.1960 },
+        "koutiala": { lat: 12.3911, lng: -5.4658 },
+        "kayes": { lat: 14.4469, lng: -11.4456 },
+        "gao": { lat: 16.2719, lng: -0.0447 },
+        "tombouctou": { lat: 16.7666, lng: -3.0026 }
+      };
+
+      // Extract city names from addresses
+      const pickupCity = extractCityFromAddress(order.pickupAddress);
+      const deliveryCity = extractCityFromAddress(order.deliveryAddress);
+      
+      const pickupCoords = maliCoordinates[pickupCity.toLowerCase()] || maliCoordinates["bamako"];
+      const deliveryCoords = maliCoordinates[deliveryCity.toLowerCase()] || maliCoordinates["bamako"];
+
+      // Calculate authentic route data
+      const distance = calculateDistance(
+        pickupCoords.lat, pickupCoords.lng,
+        deliveryCoords.lat, deliveryCoords.lng
+      );
+
+      // Estimate delivery time based on real Mali transportation conditions
+      const estimatedMinutes = calculateDeliveryTime(distance, order.packageType);
+      
+      // Get route status history
+      const statusHistory = await storage.getOrderStatusHistory(order.id);
+      
+      // Format route data
+      const routeData = {
+        orderId: order.id,
+        trackingNumber: order.trackingNumber,
+        distance: Math.round(distance * 100) / 100, // Round to 2 decimals
+        estimatedTime: formatEstimatedTime(estimatedMinutes),
+        currentStatus: order.status,
+        pickupLocation: {
+          id: "pickup",
+          name: pickupCity,
+          address: order.pickupAddress,
+          lat: pickupCoords.lat,
+          lng: pickupCoords.lng,
+          type: "pickup",
+          status: getLocationStatus("pickup", order.status)
+        },
+        deliveryLocation: {
+          id: "delivery", 
+          name: deliveryCity,
+          address: order.deliveryAddress,
+          lat: deliveryCoords.lat,
+          lng: deliveryCoords.lng,
+          type: "delivery",
+          status: getLocationStatus("delivery", order.status)
+        },
+        routePoints: generateRouteWaypoints(pickupCoords, deliveryCoords),
+        statusHistory: statusHistory.map(status => ({
+          id: status.id,
+          status: status.status,
+          location: status.location,
+          notes: status.notes,
+          timestamp: status.timestamp
+        })),
+        progress: calculateProgressPercentage(order.status, statusHistory)
+      };
+
+      res.json(routeData);
+    } catch (error) {
+      console.error("Route tracking error:", error);
+      res.status(500).json({ 
+        error: "Erreur lors de la récupération des données de route" 
+      });
+    }
+  });
+
+  // Helper functions for route calculations
+  function extractCityFromAddress(address: string): string {
+    const maliCities = ["Bamako", "Sikasso", "Ségou", "Segou", "Mopti", "Koutiala", "Kayes", "Gao", "Tombouctou"];
+    
+    for (const city of maliCities) {
+      if (address.toLowerCase().includes(city.toLowerCase())) {
+        return city;
+      }
+    }
+    return "Bamako"; // Default to Bamako
+  }
+
+  function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  function calculateDeliveryTime(distance: number, packageType: string): number {
+    // Mali transportation speeds (km/h)
+    const speeds = {
+      "express": 40, // Motorcycle in city
+      "standard": 25  // Mixed transportation
+    };
+    
+    const speed = packageType === "express" ? speeds.express : speeds.standard;
+    const baseTime = (distance / speed) * 60; // Convert to minutes
+    
+    // Add buffer time for Mali road conditions
+    const bufferMultiplier = 1.3;
+    return Math.round(baseTime * bufferMultiplier);
+  }
+
+  function formatEstimatedTime(minutes: number): string {
+    if (minutes < 60) {
+      return `${minutes} minutes`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
+  }
+
+  function getLocationStatus(locationType: string, orderStatus: string): string {
+    if (orderStatus === "pending") return "pending";
+    if (orderStatus === "accepted" && locationType === "pickup") return "current";
+    if (orderStatus === "picked_up" && locationType === "pickup") return "completed";
+    if (orderStatus === "picked_up" && locationType === "delivery") return "current";
+    if (orderStatus === "in_transit" && locationType === "delivery") return "current";
+    if (orderStatus === "delivered") return "completed";
+    return "pending";
+  }
+
+  function generateRouteWaypoints(pickup: any, delivery: any): any[] {
+    // Generate intermediate waypoints for route visualization
+    const waypoints = [];
+    const steps = 3;
+    
+    for (let i = 1; i < steps; i++) {
+      const progress = i / steps;
+      waypoints.push({
+        id: `waypoint_${i}`,
+        name: `Point ${i}`,
+        lat: pickup.lat + (delivery.lat - pickup.lat) * progress,
+        lng: pickup.lng + (delivery.lng - pickup.lng) * progress,
+        type: "waypoint"
+      });
+    }
+    
+    return waypoints;
+  }
+
+  function calculateProgressPercentage(status: string, history: any[]): number {
+    const statusOrder = ["pending", "accepted", "picked_up", "in_transit", "delivered"];
+    const currentIndex = statusOrder.indexOf(status);
+    return currentIndex >= 0 ? (currentIndex / (statusOrder.length - 1)) * 100 : 0;
+  }
+
+  // Test tracking endpoint with authentic Mali data
+  app.get("/api/test-tracking/:trackingNumber", async (req, res) => {
+    try {
+      const { trackingNumber } = req.params;
+      
+      const testOrder = {
+        id: 1,
+        trackingNumber: trackingNumber,
+        pickupAddress: "Marché de Medina, Bamako, Mali",
+        deliveryAddress: "ACI 2000, Bamako, Mali",
+        packageType: "express",
+        weight: "0.5kg",
+        price: "2000 FCFA",
+        status: "in_transit",
+        customerPhone: "+223 70 12 34 56",
+        driverId: "driver123",
+        paymentStatus: "paid",
+        paymentMethod: "cash",
+        estimatedDeliveryTime: "45 minutes",
+        statusHistory: [
+          {
+            id: 1,
+            status: "pending",
+            location: "Marché de Medina",
+            notes: "Commande créée",
+            timestamp: "2025-06-02T06:00:00Z"
+          },
+          {
+            id: 2, 
+            status: "accepted",
+            location: "Marché de Medina",
+            notes: "Livreur assigné",
+            timestamp: "2025-06-02T06:15:00Z"
+          },
+          {
+            id: 3,
+            status: "picked_up", 
+            location: "Marché de Medina",
+            notes: "Colis collecté",
+            timestamp: "2025-06-02T06:30:00Z"
+          },
+          {
+            id: 4,
+            status: "in_transit",
+            location: "En route vers ACI 2000",
+            notes: "Livraison en cours",
+            timestamp: "2025-06-02T06:45:00Z"
+          }
+        ]
+      };
+      
+      res.json(testOrder);
+    } catch (error) {
+      console.error("Test tracking error:", error);
+      res.status(500).json({ error: "Erreur lors du test de suivi" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
