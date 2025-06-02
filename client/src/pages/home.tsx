@@ -27,13 +27,18 @@ export default function Home() {
         {/* Welcome Section */}
         <section className="gradient-mako text-white py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-3xl lg:text-4xl font-bold mb-4">
-                Bienvenue, {user?.firstName || 'Utilisateur'}!
-              </h1>
-              <p className="text-green-100 text-lg">
-                Que souhaitez-vous faire aujourd'hui ?
-              </p>
+            <div className="grid lg:grid-cols-3 gap-6 items-start">
+              <div className="lg:col-span-2">
+                <h1 className="text-3xl lg:text-4xl font-bold mb-4">
+                  Bienvenue, {user?.firstName || 'Utilisateur'}!
+                </h1>
+                <p className="text-green-100 text-lg">
+                  Que souhaitez-vous faire aujourd'hui ?
+                </p>
+              </div>
+              <div className="lg:col-span-1">
+                <WeatherWidget location="Bamako" compact={true} />
+              </div>
             </div>
           </div>
         </section>

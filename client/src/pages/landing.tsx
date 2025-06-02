@@ -46,15 +46,6 @@ export default function Landing() {
                     variant="outline"
                     className="border-2 border-yellow-400 text-yellow-400 h-12 px-4 sm:px-6 rounded-xl font-semibold hover:bg-yellow-400 hover:text-mako-anthracite transition-colors flex items-center justify-center text-sm touch-manipulation"
                   >
-                                <i className="fas fa-question-circle mr-2"></i>
-                    Guide
-                  </Button>
-                </div>
-                <Button 
-                  onClick={() => window.location.href = "/auth/login"}
-                  variant="outline"
-                  className="border-2 border-white text-white h-12 sm:h-14 px-6 sm:px-8 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center text-sm sm:text-base touch-manipulation"
-                >        
                     <i className="fas fa-question-circle mr-2"></i>
                     Guide
                   </Button>
@@ -94,27 +85,27 @@ export default function Landing() {
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="bg-mako-green rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-shipping-fast text-white text-2xl"></i>
+                  <i className="fas fa-bolt text-white text-2xl"></i>
                 </div>
-                <h3 className="text-xl font-semibold text-mako-anthracite mb-3">Livraison Express</h3>
-                <p className="text-mako-anthracite opacity-70">Livraison dans la journée pour Bamako et principales villes du Mali</p>
+                <h3 className="text-xl font-semibold text-mako-dark mb-3">Livraison Express</h3>
+                <p className="text-mako-gray">Livraison ultra-rapide en 1-6 heures à Bamako</p>
               </CardContent>
             </Card>
             
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
-                <div className="bg-mako-green rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-shield-alt text-white text-2xl"></i>
+                <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-shield-alt text-mako-green text-2xl"></i>
                 </div>
-                <h3 className="text-xl font-semibold text-mako-dark mb-3">Sécurisé</h3>
-                <p className="text-mako-gray">Livreurs vérifiés et assurance de vos colis jusqu'à destination</p>
+                <h3 className="text-xl font-semibold text-mako-dark mb-3">Sécurité Garantie</h3>
+                <p className="text-mako-gray">Vos colis sont assurés et suivis en permanence</p>
               </CardContent>
             </Card>
             
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
-                <div className="bg-mako-green rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-mobile-alt text-white text-2xl"></i>
+                <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-mobile-alt text-mako-green text-2xl"></i>
                 </div>
                 <h3 className="text-xl font-semibold text-mako-dark mb-3">Suivi en Temps Réel</h3>
                 <p className="text-mako-gray">Suivez votre colis à chaque étape via notre application</p>
@@ -134,36 +125,54 @@ export default function Landing() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-mobile-alt text-mako-green text-2xl"></i>
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="bg-yellow-400 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                  <i className="fas fa-credit-card text-mako-anthracite text-lg"></i>
                 </div>
-                <h3 className="text-xl font-semibold text-mako-dark mb-3">Mobile Money</h3>
-                <p className="text-mako-gray">Orange Money, Moov Money et tous les opérateurs maliens</p>
-              </CardContent>
-            </Card>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Paiement Mobile</h3>
+                  <p className="text-green-100">Payez directement depuis votre téléphone avec MAKOPAY</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="bg-yellow-400 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                  <i className="fas fa-lock text-mako-anthracite text-lg"></i>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Sécurité Maximale</h3>
+                  <p className="text-green-100">Toutes vos transactions sont cryptées et sécurisées</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="bg-yellow-400 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                  <i className="fas fa-clock text-mako-anthracite text-lg"></i>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Instantané</h3>
+                  <p className="text-green-100">Confirmez votre livraison et payez en quelques secondes</p>
+                </div>
+              </div>
+            </div>
             
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-credit-card text-mako-green text-2xl"></i>
+            <div className="bg-white/10 rounded-2xl p-8 backdrop-blur-sm">
+              <div className="text-center">
+                <div className="bg-yellow-400 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-mobile-alt text-mako-anthracite text-3xl"></i>
                 </div>
-                <h3 className="text-xl font-semibold text-mako-dark mb-3">Cartes Bancaires</h3>
-                <p className="text-mako-gray">Visa, MasterCard et cartes locales acceptées</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-money-bill text-mako-green text-2xl"></i>
-                </div>
-                <h3 className="text-xl font-semibold text-mako-dark mb-3">Paiement à la Livraison</h3>
-                <p className="text-mako-gray">Payez en espèces directement au livreur</p>
-              </CardContent>
-            </Card>
+                <h3 className="text-2xl font-bold mb-4">MAKOPAY</h3>
+                <p className="text-green-100 mb-6">Le portefeuille digital du Mali intégré à MAKOEXPRESS</p>
+                <Button 
+                  className="bg-yellow-400 text-mako-anthracite hover:bg-yellow-300 font-semibold px-8 py-3"
+                  onClick={() => window.open("https://makopay.ml", "_blank")}
+                >
+                  Découvrir MAKOPAY
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
