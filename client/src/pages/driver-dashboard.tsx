@@ -345,6 +345,20 @@ export default function DriverDashboard() {
             </Card>
           </div>
 
+          {/* Driver Achievement Badges */}
+          <div className="mt-8">
+            <DriverAchievementBadges
+              driverStats={{
+                totalDeliveries: driverStats?.totalDeliveries || 0,
+                averageRating: driverStats?.averageRating || 0,
+                onTimeRate: 92,
+                totalEarnings: driverStats?.todayEarnings ? driverStats.todayEarnings * 30 : 0,
+                consecutiveDays: 15,
+                customerSatisfaction: 96
+              }}
+            />
+          </div>
+
           {/* Voice Assistant Panel for Drivers */}
           <div className="mt-8">
             <VoiceAssistantPanel userType="driver" />

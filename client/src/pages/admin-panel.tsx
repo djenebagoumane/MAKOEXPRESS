@@ -10,6 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import MobileNav from "@/components/mobile-nav";
+import CommissionBreakdownChart from "@/components/commission-breakdown-chart";
 
 export default function AdminPanel() {
   const [selectedWithdrawal, setSelectedWithdrawal] = useState<any>(null);
@@ -401,6 +402,54 @@ export default function AdminPanel() {
             </div>
           </div>
         )}
+
+        {/* Commission Breakdown Visualization */}
+        <div className="mt-8">
+          <CommissionBreakdownChart
+            data={[
+              {
+                orderId: "ORD-001",
+                totalAmount: 5000,
+                adminCommission: 1000,
+                driverPortion: 4000,
+                date: new Date().toISOString(),
+                customerName: "Aminata Traoré"
+              },
+              {
+                orderId: "ORD-002",
+                totalAmount: 3500,
+                adminCommission: 700,
+                driverPortion: 2800,
+                date: new Date(Date.now() - 86400000).toISOString(),
+                customerName: "Ibrahim Keita"
+              },
+              {
+                orderId: "ORD-003",
+                totalAmount: 7500,
+                adminCommission: 1500,
+                driverPortion: 6000,
+                date: new Date(Date.now() - 172800000).toISOString(),
+                customerName: "Fatoumata Diallo"
+              },
+              {
+                orderId: "ORD-004",
+                totalAmount: 2000,
+                adminCommission: 400,
+                driverPortion: 1600,
+                date: new Date(Date.now() - 259200000).toISOString(),
+                customerName: "Moussa Coulibaly"
+              },
+              {
+                orderId: "ORD-005",
+                totalAmount: 4200,
+                adminCommission: 840,
+                driverPortion: 3360,
+                date: new Date(Date.now() - 345600000).toISOString(),
+                customerName: "Aïcha Sangaré"
+              }
+            ]}
+          />
+        </div>
       </div>
 
       <Footer />
