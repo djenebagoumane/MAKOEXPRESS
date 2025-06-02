@@ -322,6 +322,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Weather API route
+  app.get("/api/weather", async (req, res) => {
+    try {
+      const location = req.query.location as string || "Bamako";
+      const apiKey = process.env.OPENWEATHER_API_KEY;
+      
+      if (!apiKey) {
+        return res.status(500).json({ 
+          error: "Clé API météo non configurée" 
+        });
+      }
+
+      // Mali cities coordinates
+      const maliCities: Record<string, { lat: number; lon: number }> = {
+        "bamako": { lat: 12.6392, lon: -8.0029 },
+        "sikasso": { lat: 11.3176, lon: -5.6747 },
+        "ségou": { lat: 13.4317, lon: -6.2158 },
+        "segou": { lat: 13.4317, lon: -6.2158 },
+        "mopti": { lat: 14.4843, lon: -4.1960 },
+        "koutiala": { lat: 12.3911, lon: -5.4658 },
+        "kayes": { lat: 14.4469, lon: -11.4456 },
+        "gao": { lat: 16.2719, lon: -0.0447 },
+        "tombouctou": { lat: 16.7666, lon: -3.0026 },
+        "timbuktu": { lat: 16.7666, lon: -3.0026 }
+      };
+
+      const cityKey = location.toLowerCase();
+      const coords = maliCities[cityKey] || maliCities["bamako"];
+
+      const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${apiKey}&units=metric&lang=fr`;
+      
+      const weatherResponse = await fetch(weatherUrl);
+      
+      if (!weatherResponse.ok) {
+        throw new Error("Impossible de récupérer les données météo");
+      }
+      
+      const weatherData = await weatherResponse.json();
+      
+      // Format response for our widget
+      const formattedWeather = {
+        temperature: Math.round(weatherData.main.temp),
+        condition: weatherData.weather[0].main,
+        description: weatherData.weather[0].description,
+        humidity: weatherData.main.humidity,
+        windSpeed: Math.round(weatherData.wind?.speed * 3.6) || 0, // Convert m/s to km/h
+        icon: weatherData.weather[0].icon,
+        location: location.charAt(0).toUpperCase() + location.slice(1)
+      };
+      
+      res.json(formattedWeather);
+    } catch (error) {
+      console.error("Weather API error:", error);
+      res.status(500).json({ 
+        error: "Erreur lors de la récupération des données météo" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

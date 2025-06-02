@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import MobileNav from "@/components/mobile-nav";
+import WeatherWidget from "@/components/weather-widget";
 import { Link } from "wouter";
 
 export default function Home() {

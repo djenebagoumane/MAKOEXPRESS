@@ -46,6 +46,15 @@ export default function Landing() {
                     variant="outline"
                     className="border-2 border-yellow-400 text-yellow-400 h-12 px-4 sm:px-6 rounded-xl font-semibold hover:bg-yellow-400 hover:text-mako-anthracite transition-colors flex items-center justify-center text-sm touch-manipulation"
                   >
+                                <i className="fas fa-question-circle mr-2"></i>
+                    Guide
+                  </Button>
+                </div>
+                <Button 
+                  onClick={() => window.location.href = "/auth/login"}
+                  variant="outline"
+                  className="border-2 border-white text-white h-12 sm:h-14 px-6 sm:px-8 rounded-xl font-semibold hover:bg-white hover:text-mako-green transition-colors flex items-center justify-center text-sm sm:text-base touch-manipulation"
+                >        
                     <i className="fas fa-question-circle mr-2"></i>
                     Guide
                   </Button>
@@ -62,7 +71,9 @@ export default function Landing() {
             </div>
             <div className="hidden lg:block">
               <div className="bg-white/10 rounded-2xl p-8 backdrop-blur-sm">
-                <img src="/api/placeholder/400/300" alt="Livraison Mali" className="w-full rounded-xl"/>
+                <div className="w-full h-64 bg-white/20 rounded-xl flex items-center justify-center">
+                  <i className="fas fa-truck text-white text-6xl opacity-50"></i>
+                </div>
               </div>
             </div>
           </div>
