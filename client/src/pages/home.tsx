@@ -43,10 +43,31 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Quick Actions */}
+        {/* Weather and Quick Actions */}
         <section className="py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            {/* Weather Context for Deliveries */}
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <h2 className="text-xl font-semibold text-mako-dark mb-4">Conditions de livraison actuelles</h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <WeatherWidget location="Bamako" />
+                  <WeatherWidget location="Sikasso" compact={true} />
+                </div>
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-mako-dark mb-4">Autres villes</h2>
+                <div className="space-y-3">
+                  <WeatherWidget location="Ségou" compact={true} />
+                  <WeatherWidget location="Mopti" compact={true} />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div>
+              <h2 className="text-xl font-semibold text-mako-dark mb-4">Actions rapides</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Link href="/delivery">
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                   <CardContent className="p-6 text-center">
@@ -110,6 +131,7 @@ export default function Home() {
                   </Card>
                 </Link>
               )}
+            </div>
             </div>
           </div>
         </section>

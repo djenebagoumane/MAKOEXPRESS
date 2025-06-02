@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import WeatherWidget from "@/components/weather-widget";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import AddressAutocomplete from "@/components/address-autocomplete";
@@ -167,6 +168,12 @@ export default function DeliveryExpress() {
                   <div className="text-blue-600 font-bold text-sm sm:text-base">100% Sécurisé</div>
                 </div>
               </div>
+            </div>
+            
+            {/* Weather Context for Delivery Planning */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-mako-dark mb-3">Conditions météo actuelles</h3>
+              <WeatherWidget location="Bamako" compact={true} />
             </div>
           </div>
 
