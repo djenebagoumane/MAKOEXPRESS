@@ -79,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
 
       const order = await storage.updateOrderStatus(Number(id), status, userId);
       if (!order) {
@@ -345,7 +345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/drivers/online-status', isCustomAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { isOnline } = req.body;
 
       await storage.updateDriverOnlineStatus(userId, isOnline);
@@ -370,7 +370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User account and transaction routes
   app.patch('/api/user/profile', isCustomAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const updateData = req.body;
       
       // Update user profile
@@ -389,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/transactions/my', isCustomAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Données de démonstration pour les transactions MakoPay
       const demoTransactions = [
@@ -431,7 +431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/user/preferences', isCustomAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const preferences = req.body;
       
       // Update user preferences
@@ -464,7 +464,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes
   app.get('/api/admin/drivers/pending', isCustomAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (user?.role !== 'admin') {
         return res.status(403).json({ message: "Access denied" });
       }
@@ -479,7 +479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/admin/drivers/:id/status', isCustomAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (user?.role !== 'admin') {
         return res.status(403).json({ message: "Access denied" });
       }
@@ -501,7 +501,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/admin/stats', isCustomAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (user?.role !== 'admin') {
         return res.status(403).json({ message: "Access denied" });
       }
