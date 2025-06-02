@@ -1688,6 +1688,192 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Commission and Equipment Management Routes
+  app.get("/api/drivers/tier-comparison", async (req, res) => {
+    try {
+      const standardTier = getEquipmentTierInfo("standard");
+      const premiumTier = getEquipmentTierInfo("premium");
+      
+      res.json({
+        standard: standardTier,
+        premium: premiumTier
+      });
+    } catch (error) {
+      console.error("Tier comparison error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des niveaux" });
+    }
+  });
+
+  app.post("/api/drivers/upgrade-tier", async (req, res) => {
+    try {
+      const { tier } = req.body;
+      
+      if (!tier || !["standard", "premium"].includes(tier)) {
+        return res.status(400).json({ error: "Niveau invalide" });
+      }
+
+      // Simulate driver tier upgrade request
+      const upgradeRequest = {
+        id: Date.now(),
+        requestedTier: tier,
+        currentTier: "standard",
+        status: "pending",
+        requestDate: new Date().toISOString(),
+        requiredDocuments: [
+          "Permis de conduire",
+          "Carte grise du véhicule", 
+          "Attestation d'assurance",
+          "Certificat médical d'aptitude"
+        ]
+      };
+
+      res.json({
+        message: "Demande de mise à niveau enregistrée",
+        request: upgradeRequest
+      });
+    } catch (error) {
+      console.error("Tier upgrade error:", error);
+      res.status(500).json({ error: "Erreur lors de la demande de mise à niveau" });
+    }
+  });
+
+  app.post("/api/orders/:id/calculate-commission", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { driverId, amount } = req.body;
+      
+      // Get driver details for commission calculation
+      const driver = await storage.getDriverByUserId(driverId);
+      if (!driver) {
+        return res.status(404).json({ error: "Livreur non trouvé" });
+      }
+
+      const commission = calculateCommission(driver, Number(amount));
+      
+      res.json({
+        orderId: id,
+        commission
+      });
+    } catch (error) {
+      console.error("Commission calculation error:", error);
+      res.status(500).json({ error: "Erreur lors du calcul de la commission" });
+    }
+  });
+
+  app.post("/api/payments/makopay-transfer", async (req, res) => {
+    try {
+      const { amount, makoPayAccount, transferType } = req.body;
+      
+      if (!amount || !makoPayAccount) {
+        return res.status(400).json({ error: "Montant et compte MakoPay requis" });
+      }
+
+      // Calculate transfer with MakoPay integration (free for MakoPay users)
+      const isFreeTier = transferType === "makopay";
+      const transfer = calculateMakoPayTransfer(Number(amount), isFreeTier);
+      
+      // Simulate MakoPay API call
+      const makoPayResponse = {
+        success: true,
+        transactionId: `MAKO_${Date.now()}`,
+        transferAmount: transfer.transferAmount,
+        fees: transfer.fees,
+        netAmount: transfer.netAmount,
+        recipientAccount: makoPayAccount,
+        processedAt: new Date().toISOString(),
+        status: "completed"
+      };
+
+      res.json({
+        message: "Transfert MakoPay effectué",
+        transfer: makoPayResponse
+      });
+    } catch (error) {
+      console.error("MakoPay transfer error:", error);
+      res.status(500).json({ error: "Erreur lors du transfert MakoPay" });
+    }
+  });
+
+  app.get("/api/drivers/equipment-status", async (req, res) => {
+    try {
+      // Simulate equipment status for current driver
+      const equipmentStatus = {
+        currentTier: "standard",
+        hasGpsEquipment: false,
+        hasInsurance: false,
+        hasUniform: false,
+        commissionRate: "0.20",
+        eligibleForUpgrade: true,
+        upgradeRequirements: [
+          {
+            requirement: "Documents complets",
+            status: "completed",
+            description: "Tous les documents de vérification fournis"
+          },
+          {
+            requirement: "Statut approuvé",
+            status: "completed", 
+            description: "Profil validé par l'administration"
+          },
+          {
+            requirement: "Formation sécurité",
+            status: "pending",
+            description: "Formation aux bonnes pratiques de livraison"
+          }
+        ],
+        premiumBenefits: {
+          commission: "30%",
+          equipment: [
+            "Sac GPS professionnel MAKOEXPRESS",
+            "Uniforme officiel avec logo",
+            "Assurance professionnelle complète"
+          ],
+          privileges: [
+            "Priorité sur toutes les commandes",
+            "Paiement instantané via MakoPay", 
+            "Support VIP 24/7",
+            "Badge VIP visible par les clients",
+            "Accès aux commandes premium exclusives"
+          ]
+        }
+      };
+      
+      res.json(equipmentStatus);
+    } catch (error) {
+      console.error("Equipment status error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération du statut d'équipement" });
+    }
+  });
+
+  app.post("/api/admin/approve-tier-upgrade/:driverId", async (req, res) => {
+    try {
+      const { driverId } = req.params;
+      const { tier, equipmentProvided } = req.body;
+      
+      // Update driver tier and equipment status
+      const updatedDriver = await storage.updateDriverProfile(Number(driverId), {
+        equipmentTier: tier,
+        hasGpsEquipment: equipmentProvided.includes("gps"),
+        hasInsurance: equipmentProvided.includes("insurance"),
+        hasUniform: equipmentProvided.includes("uniform"),
+        commissionRate: tier === "premium" ? "0.30" : "0.20"
+      });
+
+      res.json({
+        message: "Mise à niveau approuvée",
+        driver: updatedDriver,
+        equipmentDelivery: {
+          status: "scheduled",
+          expectedDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          items: equipmentProvided
+        }
+      });
+    } catch (error) {
+      console.error("Approve tier upgrade error:", error);
+      res.status(500).json({ error: "Erreur lors de l'approbation de la mise à niveau" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
