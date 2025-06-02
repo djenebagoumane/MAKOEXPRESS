@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,8 +19,18 @@ import { Link } from "wouter";
 export default function CustomerAccount() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("profile");
   const [language, setLanguage] = useState("fr");
+
+  // Vérifier si l'utilisateur a accès au tableau de bord livreur
+  const { data: driverProfile } = useQuery({
+    queryKey: ["/api/drivers/profile"],
+    retry: false,
+  });
+
+  // Si l'utilisateur a un profil livreur approuvé, afficher un message au lieu de rediriger
+  const isApprovedDriver = driverProfile && driverProfile.status === 'approved';
 
   // Récupérer les commandes du client
   const { data: orders, isLoading: ordersLoading } = useQuery({

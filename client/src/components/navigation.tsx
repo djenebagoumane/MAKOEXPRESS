@@ -49,13 +49,13 @@ export default function Navigation() {
                 <i className="fas fa-brain mr-1"></i>
                 Recommandations IA
               </Link>
-              <Link href="/driver/register" className="text-white hover:text-mako-light transition-colors">
-                <i className="fas fa-motorcycle mr-1"></i>
-                Devenir Livreur
-              </Link>
               <Link href="/account" className="text-white hover:text-mako-light transition-colors">
                 <i className="fas fa-user-circle mr-1"></i>
                 Mon Compte
+              </Link>
+              <Link href="/driver/register" className="text-white hover:text-mako-light transition-colors">
+                <i className="fas fa-motorcycle mr-1"></i>
+                Devenir Livreur
               </Link>
               <Link href="/admin" className="text-white hover:text-mako-light transition-colors">
                 <i className="fas fa-cog mr-1"></i>

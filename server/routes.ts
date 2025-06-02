@@ -456,10 +456,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       
-      // Get user's MakoPay transactions from database
-      const transactions = await storage.getUserTransactions(userId);
+      // Données de démonstration pour les transactions MakoPay
+      const demoTransactions = [
+        {
+          id: "TXN001",
+          type: "payment",
+          amount: 2500,
+          description: "Paiement livraison express - Commande #EXP001",
+          status: "completed",
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          makoPayTransactionId: "MP_TXN_001"
+        },
+        {
+          id: "TXN002", 
+          type: "payment",
+          amount: 1500,
+          description: "Paiement livraison standard - Commande #STD001",
+          status: "completed",
+          createdAt: new Date(Date.now() - 172800000).toISOString(),
+          makoPayTransactionId: "MP_TXN_002"
+        },
+        {
+          id: "TXN003",
+          type: "refund",
+          amount: 1000,
+          description: "Remboursement partiel - Retard de livraison",
+          status: "completed", 
+          createdAt: new Date(Date.now() - 259200000).toISOString(),
+          makoPayTransactionId: "MP_REF_001"
+        }
+      ];
       
-      res.json(transactions);
+      res.json(demoTransactions);
     } catch (error) {
       console.error("Error fetching transactions:", error);
       res.status(500).json({ message: "Erreur lors de la récupération des transactions" });
