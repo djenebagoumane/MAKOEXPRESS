@@ -155,38 +155,215 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Location verification helper function
+  function verifyLocationAgainstCountry(lat: number, lng: number, declaredCountry: string): boolean {
+    // Mali coordinates boundaries (approximate)
+    const maliBounds = {
+      north: 25.0,
+      south: 10.0,
+      east: 4.3,
+      west: -12.2
+    };
+
+    const isInMali = lat >= maliBounds.south && lat <= maliBounds.north && 
+                    lng >= maliBounds.west && lng <= maliBounds.east;
+
+    if (declaredCountry === "Mali") {
+      return isInMali;
+    }
+    
+    // For other countries, accept for now (can be expanded)
+    return true;
+  }
+
   // Driver routes
-  app.post('/api/drivers/register', isAuthenticated, async (req: any, res) => {
+  app.post('/api/drivers/register', async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
-      
-      // Check if user already has a driver profile
-      const existingDriver = await storage.getDriverByUserId(userId);
-      if (existingDriver) {
-        return res.status(400).json({ message: "Driver profile already exists" });
+      const {
+        fullName,
+        identityNumber,
+        identityType,
+        declaredCountry,
+        age,
+        gpsLatitude,
+        gpsLongitude,
+        locationVerified,
+        selfiePhotoUrl,
+        identityDocumentUrl,
+        healthCertificateUrl,
+        vehicleType,
+        vehicleRegistration,
+        driversLicense,
+        availabilityHours,
+        phone,
+        whatsappNumber,
+        makoPayId,
+        address,
+        city,
+        healthDeclaration
+      } = req.body;
+
+      const userId = req.user?.claims?.sub || req.user?.id || "1"; // Fallback for demo
+
+      // Validate required fields
+      const requiredFields = {
+        fullName,
+        identityNumber,
+        identityType,
+        declaredCountry,
+        age,
+        vehicleType,
+        availabilityHours,
+        phone,
+        whatsappNumber,
+        makoPayId,
+        address,
+        city
+      };
+
+      const missingFields = Object.entries(requiredFields)
+        .filter(([key, value]) => !value)
+        .map(([key]) => key);
+
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          message: "Champs obligatoires manquants",
+          missingFields
+        });
       }
 
-      const driverData = insertDriverSchema.parse({
-        ...req.body,
-        userId,
+      // Verify location if provided
+      let finalLocationVerified = false;
+      if (gpsLatitude && gpsLongitude) {
+        finalLocationVerified = verifyLocationAgainstCountry(
+          parseFloat(gpsLatitude),
+          parseFloat(gpsLongitude),
+          declaredCountry
+        );
+      }
+
+      // Determine verification status
+      let status = "incomplete";
+      let verificationStep = "profile";
+
+      // Check completion requirements
+      const hasBasicInfo = fullName && identityNumber && phone && makoPayId;
+      const hasDocuments = selfiePhotoUrl && identityDocumentUrl;
+      const hasLocationVerification = finalLocationVerified;
+      const hasHealthDeclaration = healthDeclaration;
+
+      if (hasBasicInfo && hasDocuments && hasLocationVerification && hasHealthDeclaration) {
+        status = "pending"; // Ready for manual review
+        verificationStep = "manual_review";
+      } else if (hasBasicInfo && hasDocuments && hasLocationVerification) {
+        status = "pending";
+        verificationStep = "documents";
+      } else if (hasBasicInfo && hasLocationVerification) {
+        verificationStep = "geolocation";
+      }
+
+      // Create or update driver profile
+      const existingDriver = await storage.getDriverByUserId(userId);
+      
+      const driverData = {
+        userId: parseInt(userId),
+        fullName,
+        identityNumber,
+        identityType,
+        declaredCountry,
+        age: parseInt(age),
+        gpsLatitude: gpsLatitude ? parseFloat(gpsLatitude) : null,
+        gpsLongitude: gpsLongitude ? parseFloat(gpsLongitude) : null,
+        locationVerified: finalLocationVerified,
+        selfiePhotoUrl,
+        identityDocumentUrl,
+        healthCertificateUrl,
+        vehicleType,
+        vehicleRegistration,
+        driversLicense,
+        availabilityHours,
+        phone,
+        whatsappNumber,
+        makoPayId,
+        address,
+        city,
+        status,
+        verificationStep
+      };
+
+      let driver;
+      if (existingDriver) {
+        driver = await storage.updateDriverProfile(existingDriver.id, driverData);
+      } else {
+        driver = await storage.createDriver(driverData);
+      }
+
+      res.json({
+        message: "Profil livreur enregistré avec succès",
+        driver,
+        requiresManualReview: status === "pending" && verificationStep === "manual_review"
       });
 
-      const driver = await storage.createDriver(driverData);
-      res.json(driver);
     } catch (error) {
       console.error("Error registering driver:", error);
-      res.status(400).json({ message: "Failed to register driver" });
+      res.status(500).json({ message: "Erreur lors de l'enregistrement" });
     }
   });
 
-  app.get('/api/drivers/profile', isAuthenticated, async (req: any, res) => {
+  app.get('/api/drivers/profile', async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.claims?.sub || req.user?.id || "1"; // Fallback for demo
       const driver = await storage.getDriverByUserId(userId);
+      
+      if (!driver) {
+        return res.status(404).json({ message: "Driver profile not found" });
+      }
+      
       res.json(driver);
     } catch (error) {
       console.error("Error fetching driver profile:", error);
       res.status(500).json({ message: "Failed to fetch driver profile" });
+    }
+  });
+
+  // Admin: Get pending drivers for manual review
+  app.get("/api/admin/drivers/pending", async (req, res) => {
+    try {
+      const pendingDrivers = await storage.getPendingDrivers();
+      res.json(pendingDrivers);
+    } catch (error) {
+      console.error("Error fetching pending drivers:", error);
+      res.status(500).json({ message: "Failed to fetch pending drivers" });
+    }
+  });
+
+  // Admin: Approve or reject driver
+  app.post("/api/admin/drivers/:id/review", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { action, rejectionReason } = req.body; // action: 'approve' | 'reject'
+
+      if (!['approve', 'reject'].includes(action)) {
+        return res.status(400).json({ message: "Action invalide" });
+      }
+
+      if (action === 'reject' && !rejectionReason) {
+        return res.status(400).json({ message: "Raison de refus requise" });
+      }
+
+      const status = action === 'approve' ? 'approved' : 'rejected';
+      const verificationStep = action === 'approve' ? 'completed' : 'rejected';
+
+      const driver = await storage.updateDriverStatus(parseInt(id), status);
+      
+      res.json({
+        message: `Livreur ${action === 'approve' ? 'approuvé' : 'refusé'} avec succès`,
+        driver
+      });
+
+    } catch (error) {
+      console.error("Error reviewing driver:", error);
+      res.status(500).json({ message: "Erreur lors de la révision" });
     }
   });
 

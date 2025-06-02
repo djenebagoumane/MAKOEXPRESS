@@ -1,0 +1,76 @@
+🧩 Objectif :
+Tout livreur qui veut travailler via ton app doit obligatoirement remplir un dossier complet, vérifié automatiquement et manuellement. Il ne peut accéder à son tableau de bord que si toutes les conditions sont validées.
+
+✅ 1. Informations obligatoires à fournir lors de la demande de permis "livreur" :
+Champ	Description	Obligatoire
+📛 Nom complet	Comme sur la pièce d’identité	✅
+🆔 Numéro d'identité (CNI, passeport, carte consulaire)	Scanner ou photo en pièce jointe	✅
+🌍 Pays de résidence actuel	Ex : Mali	✅
+🗺️ Localisation GPS automatique	L’app doit récupérer la position exacte (ex. via navigator.geolocation)	✅
+📸 Photo réelle	Selfie + photo de la pièce d’identité	✅
+🛵 Type de moyen de transport	Moto, vélo, voiture, etc.	✅
+🔧 Disponibilité horaire	Plage horaire souhaitée pour travailler	✅
+💉 Certificat de santé simple	Upload ou déclaration sur l'honneur	✅
+📱 Numéro WhatsApp (actif)	Pour le support et communication directe	✅
+💳 Compte MakoPay (identifiant)	Pour recevoir les paiements	✅
+
+📍 2. Vérification automatique via géolocalisation :
+⚙️ À intégrer dans l'app :
+📡 L’app utilise navigator.geolocation.getCurrentPosition() pour récupérer la position GPS
+
+Comparer GPS détecté avec pays déclaré :
+
+Si différence = refuser l’inscription
+
+Exemple : il dit “Mali” mais sa localisation GPS est au Ghana ➜ alerte ⚠️
+
+🔐 3. Blocage en cas d’information manquante :
+Si une seule information obligatoire est manquante ou fausse, le bouton “Accéder au tableau de bord” reste verrouillé.
+
+Afficher un message :
+
+“Veuillez compléter votre profil et vérifier votre identité avant d’accéder à votre espace livreur.”
+
+🛡️ 4. Examen manuel (facultatif mais recommandé)
+Envoie automatique du dossier à l’admin (Zeinab)
+
+Tu valides manuellement chaque compte
+
+Bouton : ✅ “Approuver” | ❌ “Refuser”
+
+🗂️ Base de données pour les livreurs (exemple en JSON ou Firebase)
+json
+Copier
+Modifier
+{
+  "id": "liv_001",
+  "nom": "Abdoulaye Sangaré",
+  "pays_declared": "Mali",
+  "pays_detected": "Mali",
+  "geolocalisation": {
+    "lat": 12.6392,
+    "lng": -8.0029
+  },
+  "etat_sante": "Déclaré en bonne santé",
+  "identité": {
+    "type": "CNI",
+    "numéro": "ML123456789",
+    "photo_selfie": "url/selfie.jpg",
+    "photo_piece": "url/cni.jpg"
+  },
+  "transport": "Moto",
+  "disponibilite": "08h00 - 18h00",
+  "makopay_id": "MP100789",
+  "statut_validation": "en attente"
+}
+🎯 Résultat final :
+Avant d’accéder au tableau de bord, le livreur doit :
+
+Compléter 100 % de son profil
+
+Être localisé dans le pays qu’il déclare
+
+Avoir un compte MakoPay lié
+
+Être validé automatiquement + manuellement (optionnel)
+

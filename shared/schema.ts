@@ -46,16 +46,54 @@ export const users = pgTable("users", {
 export const drivers = pgTable("drivers", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
-  vehicleType: varchar("vehicle_type").notNull(), // moto, vélo, voiture, à pied
+  
+  // Basic Information
+  fullName: varchar("full_name").notNull(),
+  identityNumber: varchar("identity_number").notNull(),
+  identityType: varchar("identity_type").notNull(), // cni, passport, carte_consulaire
+  declaredCountry: varchar("declared_country").notNull(),
   age: integer("age").notNull(),
-  profileImageUrl: varchar("profile_image_url"),
+  
+  // Geolocation Verification
+  gpsLatitude: decimal("gps_latitude", { precision: 10, scale: 8 }),
+  gpsLongitude: decimal("gps_longitude", { precision: 11, scale: 8 }),
+  locationVerified: boolean("location_verified").default(false),
+  
+  // Documents & Photos
+  selfiePhotoUrl: varchar("selfie_photo_url"),
   identityDocumentUrl: varchar("identity_document_url"),
-  status: varchar("status").notNull().default("pending"), // pending, approved, rejected, suspended
+  healthCertificateUrl: varchar("health_certificate_url"),
+  
+  // Transport & Availability
+  vehicleType: varchar("vehicle_type").notNull(), // moto, velo, voiture, van
+  vehicleRegistration: varchar("vehicle_registration"),
+  driversLicense: varchar("drivers_license"),
+  availabilityHours: varchar("availability_hours").notNull(), // "08:00-18:00"
+  
+  // Contact & Payment
+  phone: varchar("phone").notNull(),
+  whatsappNumber: varchar("whatsapp_number").notNull(),
+  makoPayId: varchar("makopay_id").notNull(),
+  
+  // Location
+  address: text("address").notNull(),
+  city: varchar("city").notNull(),
+  
+  // Verification Status
+  profileImageUrl: varchar("profile_image_url"),
+  status: varchar("status").notNull().default("incomplete"), // incomplete, pending, approved, rejected, suspended
+  verificationStep: varchar("verification_step").default("profile"), // profile, documents, geolocation, manual_review, completed
+  rejectionReason: text("rejection_reason"),
+  
+  // Performance
   isOnline: boolean("is_online").default(false),
   rating: decimal("rating", { precision: 3, scale: 2 }).default("0.00"),
   totalDeliveries: integer("total_deliveries").default(0),
+  
+  // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  approvedAt: timestamp("approved_at"),
 });
 
 // Delivery orders table
