@@ -15,6 +15,7 @@ import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import AddressAutocomplete from "@/components/address-autocomplete";
 import DeliveryTimePredictor from "@/components/delivery-time-predictor";
+import RecommendationPanel from "@/components/recommendation-panel";
 import MobileNav from "@/components/mobile-nav";
 import { useLocation } from "wouter";
 
@@ -363,6 +364,28 @@ export default function DeliveryForm() {
                       className="mb-6"
                     />
                   )}
+
+                  {/* AI Recommendations */}
+                  <RecommendationPanel
+                    currentContext={{
+                      pickupAddress: form.watch("pickupAddress"),
+                      deliveryAddress: form.watch("deliveryAddress"),
+                      packageType: form.watch("packageType") || serviceType,
+                      urgency: serviceType
+                    }}
+                    onApplyRecommendation={(recommendation) => {
+                      if (recommendation.suggestedPickupAddress) {
+                        form.setValue("pickupAddress", recommendation.suggestedPickupAddress);
+                      }
+                      if (recommendation.suggestedDeliveryAddress) {
+                        form.setValue("deliveryAddress", recommendation.suggestedDeliveryAddress);
+                      }
+                      if (recommendation.estimatedPrice) {
+                        setCalculatedPrice(recommendation.estimatedPrice);
+                      }
+                    }}
+                    className="mb-6"
+                  />
 
                   <FormField
                     control={form.control}
