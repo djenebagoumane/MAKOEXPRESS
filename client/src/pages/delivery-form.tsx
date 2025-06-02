@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import AddressAutocomplete from "@/components/address-autocomplete";
+import VoiceLocationSearch from "@/components/voice-location-search";
 import DeliveryTimePredictor from "@/components/delivery-time-predictor";
 import RecommendationPanel from "@/components/recommendation-panel";
 import MobileNav from "@/components/mobile-nav";
