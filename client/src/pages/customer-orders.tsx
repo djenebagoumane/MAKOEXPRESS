@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import CustomerOrderStatus from "@/components/customer-order-status";
+import VoiceControlPanel from "@/components/voice-control-panel";
 
 export default function CustomerOrders() {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -40,6 +41,9 @@ export default function CustomerOrders() {
             Suivez vos livraisons en temps réel
           </p>
         </div>
+
+        {/* Voice Control Panel */}
+        <VoiceControlPanel userType="customer" className="mb-6" />
 
         {/* Quick Search */}
         <Card className="mb-8 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">

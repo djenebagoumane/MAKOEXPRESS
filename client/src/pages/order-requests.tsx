@@ -6,10 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import OrderRequestCard from "@/components/order-request-card";
+import VoiceControlPanel from "@/components/voice-control-panel";
+import { useVoiceGuidance } from "@/hooks/useVoiceGuidance";
 
 export default function OrderRequests() {
   const [activeTab, setActiveTab] = useState<"available" | "my-orders">("available");
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds
+  const { announceNewOrder, announceStatusChange } = useVoiceGuidance();
 
   // Available orders for drivers
   const { data: availableOrders, refetch: refetchAvailable } = useQuery({
@@ -127,6 +130,9 @@ export default function OrderRequests() {
             Dernière mise à jour : {new Date().toLocaleTimeString('fr-FR')}
           </div>
         </div>
+
+        {/* Voice Control Panel */}
+        <VoiceControlPanel userType="driver" className="mb-6" />
 
         {/* Content */}
         {activeTab === "available" && (
