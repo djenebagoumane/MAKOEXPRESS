@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -187,16 +188,25 @@ export default function DeliveryForm() {
                       name="pickupAddress"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            <i className="fas fa-map-marker-alt text-mako-green mr-2"></i>
-                            Adresse de collecte
+                          <FormLabel className="flex items-center justify-between">
+                            <span>
+                              <i className="fas fa-map-marker-alt text-mako-green mr-2"></i>
+                              Adresse de collecte
+                            </span>
+                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              <i className="fas fa-microphone mr-1"></i>
+                              Recherche vocale
+                            </Badge>
                           </FormLabel>
                           <FormControl>
-                            <AddressAutocomplete
+                            <VoiceLocationSearch
                               value={field.value}
                               onChange={field.onChange}
-                              placeholder="Rechercher l'adresse de collecte..."
-                              icon="fas fa-box"
+                              placeholder="Dites votre adresse de collecte ou tapez..."
+                              onLocationSelect={(location) => {
+                                field.onChange(location.address);
+                                calculatePrice();
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
@@ -208,16 +218,25 @@ export default function DeliveryForm() {
                       name="deliveryAddress"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            <i className="fas fa-flag-checkered text-mako-green mr-2"></i>
-                            Adresse de livraison
+                          <FormLabel className="flex items-center justify-between">
+                            <span>
+                              <i className="fas fa-flag-checkered text-mako-green mr-2"></i>
+                              Adresse de livraison
+                            </span>
+                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              <i className="fas fa-microphone mr-1"></i>
+                              Recherche vocale
+                            </Badge>
                           </FormLabel>
                           <FormControl>
-                            <AddressAutocomplete
+                            <VoiceLocationSearch
                               value={field.value}
                               onChange={field.onChange}
-                              placeholder="Rechercher l'adresse de livraison..."
-                              icon="fas fa-home"
+                              placeholder="Dites votre adresse de livraison ou tapez..."
+                              onLocationSelect={(location) => {
+                                field.onChange(location.address);
+                                calculatePrice();
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
