@@ -14,8 +14,8 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-            <div className="bg-mako-green rounded-lg p-2">
-              <i className="fas fa-truck text-white text-lg sm:text-xl"></i>
+            <div className="bg-white rounded-lg p-2 shadow-sm">
+              <i className="fas fa-truck text-mako-green text-lg sm:text-xl"></i>
             </div>
             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white truncate">MAKOEXPRESS</h1>
           </Link>
