@@ -86,7 +86,7 @@ export default function Navigation() {
                   }}
                   variant="outline"
                   size="sm"
-                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white p-2 sm:px-3 cursor-pointer"
+                  className="border-white text-white hover:bg-white hover:text-mako-green p-2 sm:px-3 cursor-pointer"
                 >
                   <i className="fas fa-question-circle sm:mr-2"></i>
                   <span className="hidden sm:inline">Guide</span>
@@ -110,7 +110,7 @@ export default function Navigation() {
                   }}
                   variant="outline"
                   size="sm"
-                  className="border-mako-green text-mako-green hover:bg-mako-green hover:text-white p-2 sm:px-3 cursor-pointer"
+                  className="border-white text-white hover:bg-white hover:text-mako-green p-2 sm:px-3 cursor-pointer"
                 >
                   <i className="fas fa-question-circle sm:mr-2"></i>
                   <span className="hidden sm:inline">Guide</span>
