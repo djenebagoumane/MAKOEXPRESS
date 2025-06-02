@@ -64,6 +64,11 @@ export interface IStorage {
     pendingOrders: number;
     completedToday: number;
   }>;
+  
+  // User account operations
+  updateUserProfile(id: string, updateData: any): Promise<User | undefined>;
+  getUserTransactions(userId: string): Promise<any[]>;
+  updateUserPreferences(userId: string, preferences: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -381,6 +386,65 @@ export class DatabaseStorage implements IStorage {
       pendingOrders: Number(pendingOrdersResult.count),
       completedToday: Number(completedTodayResult.count),
     };
+  }
+
+  // User account operations
+  async updateUserProfile(id: string, updateData: any): Promise<User | undefined> {
+    try {
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          ...updateData,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, id))
+        .returning();
+      
+      return updatedUser;
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      return undefined;
+    }
+  }
+
+  async getUserTransactions(userId: string): Promise<any[]> {
+    try {
+      const userTransactions = await db
+        .select()
+        .from(transactions)
+        .where(eq(transactions.userId, userId))
+        .orderBy(desc(transactions.createdAt));
+      
+      return userTransactions;
+    } catch (error) {
+      console.error("Error fetching user transactions:", error);
+      return [];
+    }
+  }
+
+  async updateUserPreferences(userId: string, preferences: any): Promise<any> {
+    try {
+      const [updatedPrefs] = await db
+        .insert(userPreferences)
+        .values({
+          userId,
+          ...preferences,
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: userPreferences.userId,
+          set: {
+            ...preferences,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+      
+      return updatedPrefs;
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      return null;
+    }
   }
 }
 

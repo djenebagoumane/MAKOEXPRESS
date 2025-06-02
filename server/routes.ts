@@ -432,6 +432,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User account and transaction routes
+  app.patch('/api/user/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const updateData = req.body;
+      
+      // Update user profile
+      const updatedUser = await storage.updateUserProfile(userId, updateData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du profil" });
+    }
+  });
+
+  app.get('/api/transactions/my', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Get user's MakoPay transactions from database
+      const transactions = await storage.getUserTransactions(userId);
+      
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des transactions" });
+    }
+  });
+
+  app.patch('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const preferences = req.body;
+      
+      // Update user preferences
+      const updatedPreferences = await storage.updateUserPreferences(userId, preferences);
+      
+      res.json(updatedPreferences);
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour des préférences" });
+    }
+  });
+
   // Rating routes
   app.post('/api/ratings', isAuthenticated, async (req: any, res) => {
     try {

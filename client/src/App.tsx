@@ -27,6 +27,7 @@ import OrderRequests from "@/pages/order-requests";
 import CustomerOrders from "@/pages/customer-orders";
 import SmartRecommendations from "@/pages/smart-recommendations";
 import AIRecommendations from "@/pages/ai-recommendations";
+import CustomerAccount from "@/pages/customer-account";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
