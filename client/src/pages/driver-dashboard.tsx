@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,14 @@ import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import MobileNav from "@/components/mobile-nav";
 import DeliveryCard from "@/components/delivery-card";
+import VoiceAssistantPanel from "@/components/voice-assistant-panel";
+import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
 
 export default function DriverDashboard() {
+  const [previousOrderCount, setPreviousOrderCount] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { announceDriverNotification } = useVoiceAssistant();
 
   const { data: driverProfile, isLoading: profileLoading } = useQuery({
     queryKey: ["/api/drivers/profile"],
@@ -22,6 +26,21 @@ export default function DriverDashboard() {
   const { data: availableOrders, isLoading: ordersLoading } = useQuery({
     queryKey: ["/api/drivers/orders/available"],
   });
+
+  // Voice notifications for new orders
+  useEffect(() => {
+    if (availableOrders && availableOrders.length > previousOrderCount && previousOrderCount > 0) {
+      announceDriverNotification('new_order', 'high');
+      toast({
+        title: "Nouvelle commande !",
+        description: "Une nouvelle livraison est disponible près de vous",
+        variant: "default"
+      });
+    }
+    if (availableOrders) {
+      setPreviousOrderCount(availableOrders.length);
+    }
+  }, [availableOrders, previousOrderCount, announceDriverNotification, toast]);
 
   const { data: myOrders } = useQuery({
     queryKey: ["/api/drivers/orders/my"],
@@ -323,6 +342,11 @@ export default function DriverDashboard() {
                 )}
               </CardContent>
             </Card>
+          </div>
+
+          {/* Voice Assistant Panel for Drivers */}
+          <div className="mt-8">
+            <VoiceAssistantPanel userType="driver" />
           </div>
         </div>
       </div>
