@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import AddressAutocomplete from "@/components/address-autocomplete";
+import DeliveryTimePredictor from "@/components/delivery-time-predictor";
 import MobileNav from "@/components/mobile-nav";
 import { useLocation } from "wouter";
 
@@ -347,6 +348,21 @@ export default function DeliveryForm() {
                       )}
                     />
                   </div>
+
+                  {/* Predictive Delivery Time */}
+                  {form.watch("pickupAddress") && form.watch("deliveryAddress") && (
+                    <DeliveryTimePredictor
+                      pickupAddress={form.watch("pickupAddress")}
+                      deliveryAddress={form.watch("deliveryAddress")}
+                      packageType={form.watch("packageType") || serviceType}
+                      onPredictionUpdate={(prediction) => {
+                        // Update calculated price based on prediction factors
+                        const basePriceWithFactors = calculatedPrice * (1 + (prediction.weatherImpact / 100));
+                        setCalculatedPrice(Math.round(basePriceWithFactors));
+                      }}
+                      className="mb-6"
+                    />
+                  )}
 
                   <FormField
                     control={form.control}
