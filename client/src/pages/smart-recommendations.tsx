@@ -422,7 +422,7 @@ export default function SmartRecommendations() {
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="standard">Standard (même jour)</SelectItem>
-                                <SelectItem value="express">Express (&lt; 2h)</SelectItem>
+                                <SelectItem value="express">Express (moins de 2h)</SelectItem>
                                 <SelectItem value="scheduled">Programmée</SelectItem>
                               </SelectContent>
                             </Select>
