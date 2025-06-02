@@ -163,6 +163,10 @@ export default function LoginPage() {
             </Form>
 
             <div className="mt-4 text-center space-y-2">
+              <Link href="/auth/forgot-password" className="text-green-600 hover:underline text-sm block mb-4">
+                Mot de passe oublié ?
+              </Link>
+              
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Vous n'avez pas de compte ?{" "}
                 <Link href="/auth/register" className="text-green-600 hover:underline">

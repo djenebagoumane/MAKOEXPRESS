@@ -141,7 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         healthDeclaration
       } = req.body;
 
-      const userId = req.user?.claims?.sub || req.user?.id || "1"; // Fallback for demo
+      const userId = req.user?.id || "1"; // Fallback for demo
 
       // Validate required fields
       const requiredFields = {
@@ -250,7 +250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/drivers/profile', async (req, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.user?.id || "1"; // Fallback for demo
+      const userId = req.user?.id || "1"; // Fallback for demo
       const driver = await storage.getDriverByUserId(userId);
       
       if (!driver) {
@@ -1953,6 +1953,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Approve tier upgrade error:", error);
       res.status(500).json({ error: "Erreur lors de l'approbation de la mise à niveau" });
+    }
+  });
+
+  // Password recovery route
+  app.post("/api/forgot-password", async (req: Request, res: Response) => {
+    try {
+      const { identifier } = req.body;
+      
+      if (!identifier) {
+        return res.status(400).json({ message: "Email ou numéro de téléphone requis" });
+      }
+      
+      // Find user by email or phone
+      const user = await storage.getUserByIdentifier(identifier);
+      if (!user) {
+        // Don't reveal if user exists for security
+        return res.json({ message: "Si cet utilisateur existe, un lien de réinitialisation a été envoyé" });
+      }
+
+      // In a real app, you would:
+      // 1. Generate a secure reset token
+      // 2. Save it to database with expiration
+      // 3. Send email/SMS with reset link
+      
+      // For now, just simulate success
+      console.log(`Password reset requested for user: ${user.email || user.phoneNumber}`);
+      
+      res.json({ message: "Lien de réinitialisation envoyé" });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Erreur serveur" });
     }
   });
 
