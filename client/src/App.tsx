@@ -42,6 +42,7 @@ function Router() {
           <Route path="/delivery/standard" component={DeliveryStandard} />
           <Route path="/delivery" component={DeliveryForm} />
           <Route path="/driver/register" component={BecomeDriver} />
+          <Route path="/driver-registration" component={DriverRegistration} />
           <Route path="/driver/orders" component={OrderRequests} />
           <Route path="/customer/orders" component={CustomerOrders} />
           <Route path="/auth/forgot-password" component={ForgotPassword} />
@@ -58,6 +59,7 @@ function Router() {
           <Route path="/delivery" component={DeliveryForm} />
           <Route path="/tracking" component={Tracking} />
           <Route path="/driver/register" component={BecomeDriver} />
+          <Route path="/driver-registration" component={DriverRegistration} />
           <Route path="/driver/dashboard" component={DriverDashboard} />
           <Route path="/admin" component={AdminPanel} />
           <Route path="/help" component={HelpCenter} />

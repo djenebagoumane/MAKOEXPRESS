@@ -26,10 +26,11 @@ export interface IStorage {
   
   // Driver operations
   createDriver(driver: InsertDriver): Promise<Driver>;
-  getDriverByUserId(userId: number): Promise<Driver | undefined>;
+  getDriverByUserId(userId: string): Promise<Driver | undefined>;
   getDrivers(): Promise<Driver[]>;
   getPendingDrivers(): Promise<Driver[]>;
   updateDriverStatus(id: number, status: string): Promise<Driver | undefined>;
+  updateDriverProfile(id: number, updateData: any): Promise<Driver | undefined>;
   updateDriverOnlineStatus(userId: number, isOnline: boolean): Promise<void>;
   
   // Order operations
@@ -100,7 +101,16 @@ export class DatabaseStorage implements IStorage {
     const [driver] = await db
       .select()
       .from(drivers)
-      .where(eq(drivers.userId, userId));
+      .where(eq(drivers.userId, parseInt(userId)));
+    return driver;
+  }
+
+  async updateDriverProfile(id: number, updateData: any): Promise<Driver | undefined> {
+    const [driver] = await db
+      .update(drivers)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(drivers.id, id))
+      .returning();
     return driver;
   }
 

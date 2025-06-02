@@ -55,8 +55,8 @@ export const drivers = pgTable("drivers", {
   age: integer("age").notNull(),
   
   // Geolocation Verification
-  gpsLatitude: decimal("gps_latitude", { precision: 10, scale: 8 }),
-  gpsLongitude: decimal("gps_longitude", { precision: 11, scale: 8 }),
+  gpsLatitude: varchar("gps_latitude"),
+  gpsLongitude: varchar("gps_longitude"),
   locationVerified: boolean("location_verified").default(false),
   
   // Documents & Photos
