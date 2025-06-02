@@ -10,7 +10,7 @@ export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-gradient-to-r from-mako-dark to-mako-green shadow-lg fixed w-full top-0 z-50 border-b-2 border-mako-orange">
+    <header className="bg-mako-green shadow-lg fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
