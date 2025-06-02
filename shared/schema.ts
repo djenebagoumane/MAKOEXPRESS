@@ -63,6 +63,10 @@ export const drivers = pgTable("drivers", {
   selfiePhotoUrl: varchar("selfie_photo_url"),
   identityDocumentUrl: varchar("identity_document_url"),
   healthCertificateUrl: varchar("health_certificate_url"),
+  driversLicenseUrl: varchar("drivers_license_url"),
+  vehicleRegistrationUrl: varchar("vehicle_registration_url"),
+  insuranceCertificateUrl: varchar("insurance_certificate_url"),
+  medicalCertificateUrl: varchar("medical_certificate_url"),
   
   // Transport & Availability
   vehicleType: varchar("vehicle_type").notNull(), // moto, velo, voiture, van

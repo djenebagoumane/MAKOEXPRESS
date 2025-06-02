@@ -46,10 +46,18 @@ export default function DriverVerificationForm({ onStepComplete, initialData }: 
   const [selfieFile, setSelfieFile] = useState<File | null>(null);
   const [identityFile, setIdentityFile] = useState<File | null>(null);
   const [healthFile, setHealthFile] = useState<File | null>(null);
+  const [driversLicenseFile, setDriversLicenseFile] = useState<File | null>(null);
+  const [vehicleRegistrationFile, setVehicleRegistrationFile] = useState<File | null>(null);
+  const [insuranceFile, setInsuranceFile] = useState<File | null>(null);
+  const [medicalCertificateFile, setMedicalCertificateFile] = useState<File | null>(null);
   
   const selfieRef = useRef<HTMLInputElement>(null);
   const identityRef = useRef<HTMLInputElement>(null);
   const healthRef = useRef<HTMLInputElement>(null);
+  const driversLicenseRef = useRef<HTMLInputElement>(null);
+  const vehicleRegistrationRef = useRef<HTMLInputElement>(null);
+  const insuranceRef = useRef<HTMLInputElement>(null);
+  const medicalCertificateRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -188,7 +196,7 @@ export default function DriverVerificationForm({ onStepComplete, initialData }: 
     },
   });
 
-  const handleFileUpload = (file: File, type: 'selfie' | 'identity' | 'health') => {
+  const handleFileUpload = (file: File, type: 'selfie' | 'identity' | 'health' | 'driversLicense' | 'vehicleRegistration' | 'insurance' | 'medicalCertificate') => {
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
       toast({
         title: "Fichier trop volumineux",
@@ -217,6 +225,18 @@ export default function DriverVerificationForm({ onStepComplete, initialData }: 
         break;
       case 'health':
         setHealthFile(file);
+        break;
+      case 'driversLicense':
+        setDriversLicenseFile(file);
+        break;
+      case 'vehicleRegistration':
+        setVehicleRegistrationFile(file);
+        break;
+      case 'insurance':
+        setInsuranceFile(file);
+        break;
+      case 'medicalCertificate':
+        setMedicalCertificateFile(file);
         break;
     }
 
@@ -660,6 +680,159 @@ export default function DriverVerificationForm({ onStepComplete, initialData }: 
                 >
                   <i className="fas fa-upload mr-2"></i>
                   {healthFile ? `Changer le document (${healthFile.name})` : 'Uploader le certificat (optionnel)'}
+                </Button>
+              </div>
+            </Card>
+
+            {/* Documents supplémentaires requis après validation */}
+            <Alert className="bg-yellow-50 border-yellow-200">
+              <i className="fas fa-exclamation-triangle text-yellow-600"></i>
+              <AlertDescription className="text-yellow-800">
+                <strong>Documents requis après validation initiale :</strong> Après approbation de votre dossier initial, 
+                vous devrez fournir ces documents pour finaliser votre inscription.
+              </AlertDescription>
+            </Alert>
+
+            {/* Driver's License */}
+            <Card className="p-6 opacity-75">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">
+                  <i className="fas fa-id-card text-mako-green mr-2"></i>
+                  Permis de conduire * (Requis après validation)
+                </h3>
+                {driversLicenseFile && <Badge className="bg-green-100 text-green-800">Uploadé</Badge>}
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Photocopie claire et lisible de votre permis de conduire valide.
+                </p>
+                
+                <input
+                  ref={driversLicenseRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'driversLicense')}
+                  className="hidden"
+                />
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => driversLicenseRef.current?.click()}
+                  className="w-full"
+                  disabled
+                >
+                  <i className="fas fa-upload mr-2"></i>
+                  Disponible après validation initiale
+                </Button>
+              </div>
+            </Card>
+
+            {/* Vehicle Registration */}
+            <Card className="p-6 opacity-75">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">
+                  <i className="fas fa-car text-mako-green mr-2"></i>
+                  Carte grise du véhicule * (Requis après validation)
+                </h3>
+                {vehicleRegistrationFile && <Badge className="bg-green-100 text-green-800">Uploadé</Badge>}
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Document d'immatriculation de votre véhicule de livraison.
+                </p>
+                
+                <input
+                  ref={vehicleRegistrationRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'vehicleRegistration')}
+                  className="hidden"
+                />
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => vehicleRegistrationRef.current?.click()}
+                  className="w-full"
+                  disabled
+                >
+                  <i className="fas fa-upload mr-2"></i>
+                  Disponible après validation initiale
+                </Button>
+              </div>
+            </Card>
+
+            {/* Insurance Certificate */}
+            <Card className="p-6 opacity-75">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">
+                  <i className="fas fa-shield-alt text-mako-green mr-2"></i>
+                  Attestation d'assurance * (Requis après validation)
+                </h3>
+                {insuranceFile && <Badge className="bg-green-100 text-green-800">Uploadé</Badge>}
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Attestation d'assurance valide pour votre véhicule de livraison.
+                </p>
+                
+                <input
+                  ref={insuranceRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'insurance')}
+                  className="hidden"
+                />
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => insuranceRef.current?.click()}
+                  className="w-full"
+                  disabled
+                >
+                  <i className="fas fa-upload mr-2"></i>
+                  Disponible après validation initiale
+                </Button>
+              </div>
+            </Card>
+
+            {/* Medical Certificate */}
+            <Card className="p-6 opacity-75">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">
+                  <i className="fas fa-user-md text-mako-green mr-2"></i>
+                  Certificat médical d'aptitude * (Requis après validation)
+                </h3>
+                {medicalCertificateFile && <Badge className="bg-green-100 text-green-800">Uploadé</Badge>}
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Certificat médical récent attestant de votre aptitude à conduire et travailler.
+                </p>
+                
+                <input
+                  ref={medicalCertificateRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'medicalCertificate')}
+                  className="hidden"
+                />
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => medicalCertificateRef.current?.click()}
+                  className="w-full"
+                  disabled
+                >
+                  <i className="fas fa-upload mr-2"></i>
+                  Disponible après validation initiale
                 </Button>
               </div>
             </Card>
