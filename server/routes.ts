@@ -5,6 +5,7 @@ import { getSession, isAuthenticated, hashPassword, verifyPassword } from "./aut
 import { registerSchema, loginSchema } from "@shared/schema";
 import { insertOrderSchema, insertDriverSchema, insertDriverRatingSchema } from "@shared/schema";
 import { calculateCommission, getEquipmentTierInfo, canUpgradeToPremium, calculateMakoPayTransfer } from "./commissionCalculator";
+import { makoPayService } from "./makoPay";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1359,32 +1360,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // MakoPay payment simulation
+  // MakoPay payment processing
   app.post("/api/payments/makopay", async (req, res) => {
     try {
-      const { orderId, amount, customerPhone, driverPhone } = req.body;
+      const { orderId, amount, customerPhone, driverPhone, driverId } = req.body;
       
-      // Calculate commission (20% for admin)
-      const totalAmount = Number(amount);
-      const adminCommission = totalAmount * 0.20;
-      const driverPortion = totalAmount * 0.80;
+      if (!orderId || !amount || !customerPhone) {
+        return res.status(400).json({ error: "Données de paiement incomplètes" });
+      }
 
-      // Simulate MakoPay payment processing
-      const paymentResult = {
-        success: true,
-        transactionId: `MAKO_PAY_${Date.now()}`,
-        orderId,
-        totalAmount: totalAmount.toFixed(2),
-        adminCommission: adminCommission.toFixed(2),
-        driverPortion: driverPortion.toFixed(2),
-        status: "completed",
-        processedAt: new Date().toISOString()
+      const totalAmount = Number(amount);
+      
+      // Get driver for commission calculation
+      const driver = driverId ? await storage.getDriverByUserId(driverId) : null;
+      const commission = driver ? calculateCommission(driver, totalAmount) : {
+        commissionAmount: totalAmount * 0.20,
+        driverEarnings: totalAmount * 0.80,
+        commissionRate: 0.20
       };
 
-      res.json(paymentResult);
+      try {
+        // Process payment through MakoPay
+        const paymentResult = await makoPayService.processOrderPayment(
+          orderId,
+          totalAmount,
+          customerPhone
+        );
+
+        if (paymentResult.success) {
+          // If payment successful and driver exists, transfer driver portion
+          if (driver && driverPhone && paymentResult.status === 'completed') {
+            const transferResult = await makoPayService.transferToDriver(
+              driverId,
+              commission.driverEarnings,
+              driverPhone,
+              orderId
+            );
+
+            res.json({
+              payment: paymentResult,
+              transfer: transferResult,
+              commission: {
+                totalAmount: totalAmount.toFixed(2),
+                adminCommission: commission.commissionAmount.toFixed(2),
+                driverPortion: commission.driverEarnings.toFixed(2),
+                commissionRate: commission.commissionRate
+              },
+              processedAt: new Date().toISOString()
+            });
+          } else {
+            res.json({
+              payment: paymentResult,
+              commission: {
+                totalAmount: totalAmount.toFixed(2),
+                adminCommission: commission.commissionAmount.toFixed(2),
+                driverPortion: commission.driverEarnings.toFixed(2),
+                commissionRate: commission.commissionRate
+              },
+              processedAt: new Date().toISOString()
+            });
+          }
+        } else {
+          res.status(400).json({
+            error: "Échec du paiement MakoPay",
+            details: paymentResult.message
+          });
+        }
+      } catch (makoPayError: any) {
+        console.error("MakoPay payment error:", makoPayError.message);
+        res.status(503).json({
+          error: "Service MakoPay temporairement indisponible",
+          details: makoPayError.message
+        });
+      }
     } catch (error) {
-      console.error("MakoPay payment error:", error);
-      res.status(500).json({ error: "Erreur lors du paiement MakoPay" });
+      console.error("Payment processing error:", error);
+      res.status(500).json({ error: "Erreur lors du traitement du paiement" });
+    }
+  });
+
+  // MakoPay webhook handler
+  app.post("/api/webhooks/makopay", async (req, res) => {
+    try {
+      const signature = req.headers['x-signature'] as string;
+      const timestamp = req.headers['x-timestamp'] as string;
+      const payload = JSON.stringify(req.body);
+
+      // Validate webhook signature
+      if (!makoPayService.validateWebhook(signature, payload, timestamp)) {
+        return res.status(401).json({ error: "Signature webhook invalide" });
+      }
+
+      const { transaction_id, status, order_id, amount } = req.body;
+
+      // Update order status based on payment status
+      if (order_id) {
+        const order = await storage.getOrder(Number(order_id));
+        if (order) {
+          let newStatus = order.status;
+          if (status === 'completed') {
+            newStatus = 'paid';
+          } else if (status === 'failed') {
+            newStatus = 'payment_failed';
+          }
+
+          await storage.updateOrderStatus(order.id, newStatus);
+          
+          // Add status history
+          await storage.addOrderStatusHistory({
+            orderId: order.id,
+            status: newStatus,
+            location: "Système de paiement",
+            notes: `Paiement MakoPay ${status} - Transaction: ${transaction_id}`
+          });
+        }
+      }
+
+      res.json({ message: "Webhook traité avec succès" });
+    } catch (error) {
+      console.error("Webhook processing error:", error);
+      res.status(500).json({ error: "Erreur lors du traitement du webhook" });
+    }
+  });
+
+  // Check MakoPay transaction status
+  app.get("/api/payments/makopay/:transactionId/status", async (req, res) => {
+    try {
+      const { transactionId } = req.params;
+      
+      const status = await makoPayService.checkTransactionStatus(transactionId);
+      res.json(status);
+    } catch (error: any) {
+      console.error("Transaction status check error:", error);
+      res.status(503).json({
+        error: "Service MakoPay temporairement indisponible",
+        details: error.message
+      });
+    }
+  });
+
+  // Get MakoPay account balance
+  app.get("/api/payments/makopay/balance", async (req, res) => {
+    try {
+      const balance = await makoPayService.getAccountBalance();
+      res.json(balance);
+    } catch (error: any) {
+      console.error("Balance check error:", error);
+      res.status(503).json({
+        error: "Service MakoPay temporairement indisponible",
+        details: error.message
+      });
     }
   });
 
@@ -1762,7 +1887,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/payments/makopay-transfer", async (req, res) => {
     try {
-      const { amount, makoPayAccount, transferType } = req.body;
+      const { amount, makoPayAccount, transferType, driverId, orderId } = req.body;
       
       if (!amount || !makoPayAccount) {
         return res.status(400).json({ error: "Montant et compte MakoPay requis" });
@@ -1772,22 +1897,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isFreeTier = transferType === "makopay";
       const transfer = calculateMakoPayTransfer(Number(amount), isFreeTier);
       
-      // Simulate MakoPay API call
-      const makoPayResponse = {
-        success: true,
-        transactionId: `MAKO_${Date.now()}`,
-        transferAmount: transfer.transferAmount,
-        fees: transfer.fees,
-        netAmount: transfer.netAmount,
-        recipientAccount: makoPayAccount,
-        processedAt: new Date().toISOString(),
-        status: "completed"
-      };
+      try {
+        // Real MakoPay API call
+        const makoPayResponse = await makoPayService.transferToDriver(
+          driverId || `driver_${Date.now()}`,
+          transfer.transferAmount,
+          makoPayAccount,
+          orderId || `order_${Date.now()}`
+        );
 
-      res.json({
-        message: "Transfert MakoPay effectué",
-        transfer: makoPayResponse
-      });
+        res.json({
+          message: "Transfert MakoPay effectué",
+          transfer: {
+            ...makoPayResponse,
+            transferAmount: transfer.transferAmount,
+            fees: transfer.fees,
+            netAmount: transfer.netAmount,
+            recipientAccount: makoPayAccount,
+            processedAt: new Date().toISOString()
+          }
+        });
+      } catch (makoPayError: any) {
+        console.error("MakoPay API Error:", makoPayError.message);
+        res.status(503).json({ 
+          error: "Service MakoPay temporairement indisponible",
+          details: makoPayError.message
+        });
+      }
     } catch (error) {
       console.error("MakoPay transfer error:", error);
       res.status(500).json({ error: "Erreur lors du transfert MakoPay" });

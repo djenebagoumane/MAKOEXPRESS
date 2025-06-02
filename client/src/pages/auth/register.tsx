@@ -52,8 +52,8 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-mako flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-xl border border-gray-100">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
             <div className="bg-mako-green rounded-lg p-3">

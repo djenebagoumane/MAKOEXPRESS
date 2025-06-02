@@ -82,7 +82,7 @@ export default function Contact() {
       title: "WhatsApp Business",
       description: "Chat en temps réel",
       icon: "fab fa-whatsapp",
-      contact: "+223 XX XX XX XX",
+      contact: "+223 75 70 02 65",
       availability: "Réponse sous 5 min",
       color: "bg-green-600"
     },
@@ -90,7 +90,7 @@ export default function Contact() {
       title: "Email Support",
       description: "Pour les demandes détaillées",
       icon: "fas fa-envelope",
-      contact: "support@makoexpress.ml",
+      contact: "support@makoexpress.com",
       availability: "Réponse sous 2h",
       color: "bg-blue-500"
     },
@@ -98,7 +98,7 @@ export default function Contact() {
       title: "Urgences 24/7",
       description: "Ligne d'urgence",
       icon: "fas fa-exclamation-triangle",
-      contact: "+223 XX XX XX XX",
+      contact: "+223 96 86 52 10",
       availability: "24h/24 - 7j/7",
       color: "bg-red-500"
     }
@@ -115,9 +115,9 @@ export default function Contact() {
     {
       city: "Sikasso",
       address: "Centre-ville, Avenue de la République",
-      phone: "+223 XX XX XX XX",
+      phone: "+223 75 70 02 65",
       hours: "Lun-Ven 8h-17h, Sam 9h-14h",
-      manager: "Responsable: Fatou DIALLO"
+      manager: "Responsable: Fatou "
     },
     {
       city: "Ségou",
