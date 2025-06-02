@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { getSession, isAuthenticated, hashPassword, verifyPassword } from "./auth";
 import { registerSchema, loginSchema } from "@shared/schema";
 import { insertOrderSchema, insertDriverSchema, insertDriverRatingSchema } from "@shared/schema";
+import { calculateCommission, getEquipmentTierInfo, canUpgradeToPremium, calculateMakoPayTransfer } from "./commissionCalculator";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {

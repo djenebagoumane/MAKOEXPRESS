@@ -89,6 +89,13 @@ export const drivers = pgTable("drivers", {
   verificationStep: varchar("verification_step").default("profile"), // profile, documents, geolocation, manual_review, completed
   rejectionReason: text("rejection_reason"),
   
+  // Equipment & Commission Tier
+  equipmentTier: varchar("equipment_tier").default("standard"), // "standard" or "premium"
+  hasGpsEquipment: boolean("has_gps_equipment").default(false),
+  hasInsurance: boolean("has_insurance").default(false),
+  hasUniform: boolean("has_uniform").default(false),
+  commissionRate: decimal("commission_rate", { precision: 3, scale: 2 }).default("0.20"), // 20% for standard, 30% for premium
+  
   // Performance
   isOnline: boolean("is_online").default(false),
   rating: decimal("rating", { precision: 3, scale: 2 }).default("0.00"),
