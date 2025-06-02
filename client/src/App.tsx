@@ -75,6 +75,7 @@ function Router() {
           <Route path="/customer/orders" component={CustomerOrders} />
           <Route path="/smart-recommendations" component={SmartRecommendations} />
           <Route path="/ai-recommendations" component={AIRecommendations} />
+          <Route path="/account" component={CustomerAccount} />
         </>
       )}
       <Route component={NotFound} />
