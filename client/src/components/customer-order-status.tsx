@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import VoiceAssistantPanel from "@/components/voice-assistant-panel";
+import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
 
 interface CustomerOrderStatusProps {
   orderId: number;
@@ -18,8 +20,10 @@ export default function CustomerOrderStatus({
   refreshInterval = 15000 
 }: CustomerOrderStatusProps) {
   const [isCancelling, setIsCancelling] = useState(false);
+  const [previousStatus, setPreviousStatus] = useState<string>("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { announceDeliveryUpdate } = useVoiceAssistant();
 
   // Poll order status
   const { data: orderStatus, refetch } = useQuery({
@@ -60,17 +64,31 @@ export default function CustomerOrderStatus({
     }
   };
 
-  // Auto-refresh when order status changes
+  // Voice announcements for status changes
   useEffect(() => {
-    if (orderStatus?.status === "accepted") {
-      // Driver assigned - notify customer
+    if (orderStatus?.status && orderStatus.status !== previousStatus && previousStatus !== "") {
+      // Announce status change via voice assistant
+      announceDeliveryUpdate({
+        orderId: trackingNumber,
+        status: orderStatus.status,
+        driverName: orderStatus.driverInfo?.name,
+        estimatedTime: orderStatus.estimatedTime,
+        priority: orderStatus.status === 'delivered' ? 'high' : 'medium'
+      });
+
+      // Also show toast notification
+      const statusInfo = getStatusInfo(orderStatus.status);
       toast({
-        title: "Livreur trouvé !",
-        description: "Un livreur a accepté votre commande",
+        title: statusInfo.title,
+        description: statusInfo.description,
         variant: "default"
       });
     }
-  }, [orderStatus?.status, toast]);
+    
+    if (orderStatus?.status) {
+      setPreviousStatus(orderStatus.status);
+    }
+  }, [orderStatus?.status, previousStatus, announceDeliveryUpdate, trackingNumber, orderStatus?.driverInfo, orderStatus?.estimatedTime, toast]);
 
   const getStatusInfo = (status: string) => {
     switch (status) {
@@ -256,6 +274,11 @@ export default function CustomerOrderStatus({
               )}
             </div>
           )}
+        </div>
+
+        {/* Voice Assistant Panel */}
+        <div className="mt-6">
+          <VoiceAssistantPanel userType="customer" className="border-blue-100" />
         </div>
       </CardContent>
     </Card>
