@@ -550,6 +550,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return currentIndex >= 0 ? (currentIndex / (statusOrder.length - 1)) * 100 : 0;
   }
 
+  // Password reset endpoints
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { identifier, resetMethod } = req.body;
+      
+      // Generate a 6-digit verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // In a real implementation, you would:
+      // 1. Check if user exists with this email/phone
+      // 2. Store the verification code with expiration
+      // 3. Send the code via email/SMS service
+      
+      // For now, return success (code would be sent via external service)
+      console.log(`Reset code for ${identifier}: ${verificationCode}`);
+      
+      res.json({ 
+        message: "Code de réinitialisation envoyé",
+        method: resetMethod 
+      });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ error: "Erreur lors de l'envoi du code" });
+    }
+  });
+
+  app.post("/api/auth/verify-reset-code", async (req, res) => {
+    try {
+      const { identifier, code } = req.body;
+      
+      // In a real implementation, verify the code against stored data
+      // For demo purposes, accept any 6-digit code
+      if (code && code.length === 6) {
+        const resetToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+        
+        res.json({
+          message: "Code vérifié",
+          token: resetToken
+        });
+      } else {
+        res.status(400).json({ error: "Code invalide" });
+      }
+    } catch (error) {
+      console.error("Verify code error:", error);
+      res.status(500).json({ error: "Erreur lors de la vérification" });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, password } = req.body;
+      
+      if (!token || !password) {
+        return res.status(400).json({ error: "Token et mot de passe requis" });
+      }
+      
+      if (password.length < 6) {
+        return res.status(400).json({ error: "Mot de passe trop court" });
+      }
+      
+      // In a real implementation:
+      // 1. Verify the reset token
+      // 2. Hash the new password
+      // 3. Update user's password in database
+      
+      res.json({ message: "Mot de passe réinitialisé avec succès" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ error: "Erreur lors de la réinitialisation" });
+    }
+  });
+
   // Test tracking endpoint with authentic Mali data
   app.get("/api/test-tracking/:trackingNumber", async (req, res) => {
     try {
