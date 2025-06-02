@@ -36,9 +36,11 @@ function Router() {
     <Switch>
       {isLoading || !isAuthenticated ? (
         <>
-          <Route path="/" component={Landing} />
+          <Route path="/" component={Login} />
           <Route path="/auth/login" component={Login} />
           <Route path="/auth/register" component={Register} />
+          <Route path="/auth/forgot-password" component={ForgotPassword} />
+          <Route path="/landing" component={Landing} />
           <Route path="/tracking" component={Tracking} />
           <Route path="/delivery/express" component={DeliveryExpress} />
           <Route path="/delivery/standard" component={DeliveryStandard} />
@@ -47,7 +49,6 @@ function Router() {
           <Route path="/driver-registration" component={DriverRegistration} />
           <Route path="/driver/orders" component={OrderRequests} />
           <Route path="/customer/orders" component={CustomerOrders} />
-          <Route path="/auth/forgot-password" component={ForgotPassword} />
           <Route path="/help" component={HelpCenter} />
           <Route path="/contact" component={Contact} />
           <Route path="/terms" component={TermsOfService} />

@@ -1957,7 +1957,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Password recovery route
-  app.post("/api/forgot-password", async (req: Request, res: Response) => {
+  app.post("/api/forgot-password", async (req, res) => {
     try {
       const { identifier } = req.body;
       
