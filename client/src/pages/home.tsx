@@ -119,7 +119,7 @@ export default function Home() {
               )}
 
               {/* Mon Compte - pour tous les utilisateurs connectés */}
-              <Link href="/account">
+              <Link href="/customer-account">
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
                   <CardContent className="p-6 text-center">
                     <div className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg">
