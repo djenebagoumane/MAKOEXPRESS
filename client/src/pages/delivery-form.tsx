@@ -37,8 +37,8 @@ type DeliveryFormData = z.infer<typeof deliverySchema>;
 
 export default function DeliveryForm() {
   const [calculatedPrice, setCalculatedPrice] = useState(0);
-  const [selectedPickupLocation, setSelectedPickupLocation] = useState(null);
-  const [selectedDeliveryLocation, setSelectedDeliveryLocation] = useState(null);
+  const [selectedPickupLocation, setSelectedPickupLocation] = useState<any>(null);
+  const [selectedDeliveryLocation, setSelectedDeliveryLocation] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [location, setLocation] = useLocation();

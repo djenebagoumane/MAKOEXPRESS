@@ -343,10 +343,22 @@ export default function VoiceEmojiLocationSelector({
 
         {/* Voice Instructions */}
         <div className="text-sm text-gray-600 space-y-1">
-          <p className="font-medium">Instructions vocales:</p>
-          <p>• Cliquez sur "Parler" et dites le lieu souhaité</p>
-          <p>• Exemples: "maison", "bureau", "école", "hôpital", "marché"</p>
-          <p>• Ou cliquez directement sur un emoji</p>
+          <p className="font-medium">
+            {selectedLanguage === 'bm' ? 'Kuma-kan caya:' : 'Instructions vocales:'}
+          </p>
+          {selectedLanguage === 'bm' ? (
+            <>
+              <p>• "Kuma" kan di ka yoro fɔ</p>
+              <p>• Misali: "so", "baara yoro", "kalan yoro", "dɔgɔtɔrɔ so", "sugu"</p>
+              <p>• Walima emoji kan di</p>
+            </>
+          ) : (
+            <>
+              <p>• Cliquez sur "Parler" et dites le lieu souhaité</p>
+              <p>• Exemples: "maison", "bureau", "école", "hôpital", "marché"</p>
+              <p>• Ou cliquez directement sur un emoji</p>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
