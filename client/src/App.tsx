@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
-import Home from "@/pages/home";
+import Home from "@/pages/home-clean";
 import DeliveryForm from "@/pages/delivery-form";
 import DeliveryExpress from "@/pages/delivery-express";
 import DeliveryStandard from "@/pages/delivery-standard";
