@@ -12,7 +12,7 @@ export default function Navigation() {
   return (
     <header className="bg-mako-green shadow-lg fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 gap-2">
           <Link href="/" className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
             <div className="bg-mako-orange rounded-lg p-2 shadow-sm">
               <i className="fas fa-truck text-white text-lg sm:text-xl"></i>
@@ -64,23 +64,23 @@ export default function Navigation() {
             </nav>
           )}
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Menu hamburger mobile */}
             <button 
-              className="md:hidden"
+              className="md:hidden bg-white/20 hover:bg-white/30 rounded-lg p-2 transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-mako-anthracite text-xl`}></i>
+              <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-white text-lg`}></i>
             </button>
 
             {isAuthenticated ? (
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                <div className="hidden md:flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-mako-green flex items-center justify-center">
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                <div className="hidden lg:flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                     <i className="fas fa-user text-white text-sm"></i>
                   </div>
                   <span className="text-sm text-white">
-                    Utilisateur
+                    Client
                   </span>
                 </div>
                 <Button 
@@ -90,10 +90,10 @@ export default function Navigation() {
                   }}
                   variant="outline"
                   size="sm"
-                  className="border-white text-white hover:bg-white hover:text-mako-green p-2 sm:px-3 cursor-pointer"
+                  className="border-white text-white hover:bg-white hover:text-mako-green px-2 py-2 cursor-pointer min-w-0 flex-shrink-0"
                 >
-                  <i className="fas fa-question-circle sm:mr-2"></i>
-                  <span className="hidden sm:inline">Guide</span>
+                  <i className="fas fa-question-circle text-sm"></i>
+                  <span className="hidden lg:inline text-sm ml-1">Guide</span>
                 </Button>
                 <Button 
                   onClick={() => window.location.href = "/auth/login"}
@@ -106,7 +106,7 @@ export default function Navigation() {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <Button 
                   onClick={() => {
                     console.log("Guide button clicked (not authenticated)");
@@ -114,10 +114,10 @@ export default function Navigation() {
                   }}
                   variant="outline"
                   size="sm"
-                  className="border-white text-white hover:bg-white hover:text-mako-green p-2 sm:px-3 cursor-pointer"
+                  className="border-white text-white hover:bg-white hover:text-mako-green px-2 py-2 cursor-pointer min-w-0 flex-shrink-0"
                 >
-                  <i className="fas fa-question-circle sm:mr-2"></i>
-                  <span className="hidden sm:inline">Guide</span>
+                  <i className="fas fa-question-circle text-sm"></i>
+                  <span className="hidden lg:inline text-sm ml-1">Guide</span>
                 </Button>
                 <Button 
                   onClick={() => window.location.href = "/auth/login"}
@@ -167,6 +167,22 @@ export default function Navigation() {
               >
                 <i className="fas fa-search mr-2"></i>
                 Suivi de Colis
+              </Link>
+              <Link 
+                href="/ai-recommendations" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-brain mr-2"></i>
+                Recommandations IA
+              </Link>
+              <Link 
+                href="/customer-account" 
+                className="block px-3 py-2 text-purple-600 hover:bg-purple-100 hover:text-purple-700 rounded-md transition-colors font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-user-circle mr-2"></i>
+                Mon Compte Client
               </Link>
               <Link 
                 href="/driver/register" 
