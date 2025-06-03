@@ -120,13 +120,16 @@ export default function Home() {
 
               {/* Mon Compte - pour tous les utilisateurs connectés */}
               <Link href="/account">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
                   <CardContent className="p-6 text-center">
-                    <div className="bg-purple-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <i className="fas fa-user text-white text-2xl"></i>
+                    <div className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <i className="fas fa-user-circle text-white text-2xl"></i>
                     </div>
-                    <h3 className="font-semibold text-mako-dark">Mon Compte</h3>
-                    <p className="text-sm text-mako-gray mt-2">Profil et historique</p>
+                    <h3 className="font-bold text-purple-700 text-lg">Mon Compte Client</h3>
+                    <p className="text-sm text-purple-600 mt-2 font-medium">Profil • Historique • Langues</p>
+                    <div className="mt-3 px-3 py-1 bg-purple-100 rounded-full text-xs text-purple-700 font-semibold">
+                      ✨ Cliquez ici pour accéder
+                    </div>
                   </CardContent>
                 </Card>
               </Link>
