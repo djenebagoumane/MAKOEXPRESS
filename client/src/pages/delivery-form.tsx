@@ -16,6 +16,7 @@ import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import AddressAutocomplete from "@/components/address-autocomplete";
 import VoiceLocationSearch from "@/components/voice-location-search";
+import VoiceEmojiLocationSelector from "@/components/voice-emoji-location-selector";
 import DeliveryTimePredictor from "@/components/delivery-time-predictor";
 import RecommendationPanel from "@/components/recommendation-panel";
 import MobileNav from "@/components/mobile-nav";
@@ -36,6 +37,8 @@ type DeliveryFormData = z.infer<typeof deliverySchema>;
 
 export default function DeliveryForm() {
   const [calculatedPrice, setCalculatedPrice] = useState(0);
+  const [selectedPickupLocation, setSelectedPickupLocation] = useState(null);
+  const [selectedDeliveryLocation, setSelectedDeliveryLocation] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [location, setLocation] = useLocation();
@@ -243,6 +246,50 @@ export default function DeliveryForm() {
                         </FormItem>
                       )}
                     />
+                  </div>
+
+                  {/* Voice-Activated Emoji Location Selectors */}
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold text-mako-green mb-2">
+                        Sélection rapide de lieux avec emojis et commande vocale
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Utilisez la reconnaissance vocale ou cliquez sur les emojis pour sélectionner rapidement vos lieux
+                      </p>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="text-md font-medium text-mako-green mb-3">
+                          <i className="fas fa-map-marker-alt mr-2"></i>
+                          Lieu de collecte
+                        </h4>
+                        <VoiceEmojiLocationSelector
+                          selectedLocation={selectedPickupLocation}
+                          onLocationSelect={(location) => {
+                            setSelectedPickupLocation(location);
+                            form.setValue("pickupAddress", `${location.emoji} ${location.name}`);
+                            calculatePrice();
+                          }}
+                        />
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-md font-medium text-mako-green mb-3">
+                          <i className="fas fa-flag-checkered mr-2"></i>
+                          Lieu de livraison
+                        </h4>
+                        <VoiceEmojiLocationSelector
+                          selectedLocation={selectedDeliveryLocation}
+                          onLocationSelect={(location) => {
+                            setSelectedDeliveryLocation(location);
+                            form.setValue("deliveryAddress", `${location.emoji} ${location.name}`);
+                            calculatePrice();
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="grid md:grid-cols-3 gap-6">
