@@ -2101,6 +2101,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User profile and preferences routes
+  app.patch("/api/user/profile", async (req, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Non authentifié" });
+      }
+
+      const { firstName, lastName, email, phoneNumber, address, country } = req.body;
+      
+      const updatedUser = await storage.updateUserProfile(userId, {
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        address,
+        country
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      }
+
+      res.json({
+        message: "Profil mis à jour avec succès",
+        user: updatedUser
+      });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ error: "Erreur lors de la mise à jour du profil" });
+    }
+  });
+
+  app.patch("/api/user/preferences", async (req, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Non authentifié" });
+      }
+
+      const preferences = req.body;
+      
+      const updatedPreferences = await storage.updateUserPreferences(userId, preferences);
+
+      res.json({
+        message: "Préférences mises à jour avec succès",
+        preferences: updatedPreferences
+      });
+    } catch (error) {
+      console.error("Update preferences error:", error);
+      res.status(500).json({ error: "Erreur lors de la mise à jour des préférences" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

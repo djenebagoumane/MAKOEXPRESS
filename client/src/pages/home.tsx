@@ -118,6 +118,19 @@ export default function Home() {
                 </Link>
               )}
 
+              {/* Mon Compte - pour tous les utilisateurs connectés */}
+              <Link href="/account">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-6 text-center">
+                    <div className="bg-purple-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <i className="fas fa-user text-white text-2xl"></i>
+                    </div>
+                    <h3 className="font-semibold text-mako-dark">Mon Compte</h3>
+                    <p className="text-sm text-mako-gray mt-2">Profil et historique</p>
+                  </CardContent>
+                </Card>
+              </Link>
+
               {user?.role === 'admin' && (
                 <Link href="/admin">
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer">
