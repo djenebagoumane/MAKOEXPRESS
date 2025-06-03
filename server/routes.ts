@@ -2020,6 +2020,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Panel API Routes
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      const stats = await storage.getAdminStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Admin stats error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des statistiques" });
+    }
+  });
+
+  app.get("/api/admin/pending-drivers", async (req, res) => {
+    try {
+      const pendingDrivers = await storage.getPendingDrivers();
+      res.json(pendingDrivers);
+    } catch (error) {
+      console.error("Pending drivers error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des livreurs en attente" });
+    }
+  });
+
+  app.get("/api/admin/commissions", async (req, res) => {
+    try {
+      // Get commission data from admin stats
+      const stats = await storage.getAdminStats();
+      res.json({
+        monthlyCommission: stats.monthlyCommission || 0,
+        totalRevenue: stats.totalRevenue || 0,
+        commissionRate: 0.25, // 25% average between standard (20%) and premium (30%)
+        completedOrders: stats.completedToday || 0
+      });
+    } catch (error) {
+      console.error("Commission data error:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des données de commission" });
+    }
+  });
+
+  app.post("/api/admin/approve-driver/:driverId", async (req, res) => {
+    try {
+      const { driverId } = req.params;
+      const updatedDriver = await storage.updateDriverStatus(Number(driverId), "approved");
+      
+      if (!updatedDriver) {
+        return res.status(404).json({ error: "Livreur non trouvé" });
+      }
+
+      res.json({
+        message: "Livreur approuvé avec succès",
+        driver: updatedDriver
+      });
+    } catch (error) {
+      console.error("Approve driver error:", error);
+      res.status(500).json({ error: "Erreur lors de l'approbation du livreur" });
+    }
+  });
+
+  app.post("/api/admin/reject-driver/:driverId", async (req, res) => {
+    try {
+      const { driverId } = req.params;
+      const { reason } = req.body;
+      
+      const updatedDriver = await storage.updateDriverStatus(Number(driverId), "rejected");
+      
+      if (!updatedDriver) {
+        return res.status(404).json({ error: "Livreur non trouvé" });
+      }
+
+      // In a real implementation, you would also save the rejection reason
+      console.log(`Driver ${driverId} rejected. Reason: ${reason}`);
+
+      res.json({
+        message: "Livreur refusé",
+        driver: updatedDriver,
+        reason
+      });
+    } catch (error) {
+      console.error("Reject driver error:", error);
+      res.status(500).json({ error: "Erreur lors du refus du livreur" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

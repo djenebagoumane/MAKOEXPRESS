@@ -1,459 +1,507 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import Navigation from "@/components/navigation";
-import Footer from "@/components/footer";
-import MobileNav from "@/components/mobile-nav";
-import CommissionBreakdownChart from "@/components/commission-breakdown-chart";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Link } from "wouter";
+import { 
+  CheckCircle, 
+  XCircle, 
+  Users, 
+  Package, 
+  TrendingUp, 
+  DollarSign, 
+  FileText, 
+  AlertTriangle, 
+  ArrowLeft,
+  Eye,
+  Download,
+  Clock
+} from "lucide-react";
+
+interface Driver {
+  id: number;
+  fullName: string;
+  identityNumber: string;
+  identityType: string;
+  phone: string;
+  vehicleType: string;
+  vehicleRegistration: string;
+  driversLicense: string;
+  status: string;
+  submissionDate: string;
+  selfiePhotoUrl?: string;
+  identityDocumentUrl?: string;
+  healthCertificateUrl?: string;
+  locationVerified: boolean;
+  tier: string;
+  totalDeliveries: number;
+  averageRating: number;
+  monthlyEarnings: number;
+}
+
+interface AdminStats {
+  totalOrders: number;
+  activeDrivers: number;
+  pendingDrivers: number;
+  completedToday: number;
+  totalRevenue: number;
+  monthlyCommission: number;
+}
 
 export default function AdminPanel() {
-  const [selectedWithdrawal, setSelectedWithdrawal] = useState<any>(null);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  // Get admin dashboard data
-  const { data: dashboardData, isLoading } = useQuery({
-    queryKey: ["/api/admin/dashboard"],
+  // Fetch admin dashboard data
+  const { data: adminStats, isLoading: statsLoading } = useQuery({
+    queryKey: ["/api/admin/stats"],
+    retry: false
   });
 
-  // Get pending withdrawals
-  const { data: pendingWithdrawals } = useQuery({
-    queryKey: ["/api/admin/withdrawals"],
+  // Fetch pending drivers
+  const { data: pendingDrivers, isLoading: driversLoading } = useQuery({
+    queryKey: ["/api/admin/pending-drivers"],
+    retry: false
   });
 
-  const approveWithdrawalMutation = useMutation({
-    mutationFn: async (withdrawalId: number) => {
-      return await apiRequest(`/api/admin/approve-withdrawal/${withdrawalId}`, {
-        method: "POST",
-      });
+  // Fetch commission data
+  const { data: commissionData, isLoading: commissionLoading } = useQuery({
+    queryKey: ["/api/admin/commissions"],
+    retry: false
+  });
+
+  // Approve driver mutation
+  const approveDriverMutation = useMutation({
+    mutationFn: async (driverId: number) => {
+      const res = await apiRequest("POST", `/api/admin/approve-driver/${driverId}`);
+      return res.json();
     },
     onSuccess: () => {
       toast({
-        title: "Retrait approuvé",
-        description: "Le transfert MakoPay a été effectué avec succès",
-        variant: "default",
+        title: "Livreur approuvé",
+        description: "Le livreur a été approuvé avec succès",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/withdrawals"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-drivers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Erreur",
-        description: "Impossible d'approuver le retrait",
+        description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const rejectWithdrawalMutation = useMutation({
-    mutationFn: async ({ withdrawalId, reason }: { withdrawalId: number; reason: string }) => {
-      return await apiRequest(`/api/admin/reject-withdrawal/${withdrawalId}`, {
-        method: "POST",
-        body: JSON.stringify({ reason }),
-      });
+  // Reject driver mutation
+  const rejectDriverMutation = useMutation({
+    mutationFn: async ({ driverId, reason }: { driverId: number; reason: string }) => {
+      const res = await apiRequest("POST", `/api/admin/reject-driver/${driverId}`, { reason });
+      return res.json();
     },
     onSuccess: () => {
       toast({
-        title: "Retrait rejeté",
-        description: "Le livreur sera informé de la décision",
-        variant: "default",
+        title: "Livreur refusé",
+        description: "Le livreur a été refusé avec raison fournie",
       });
-      setSelectedWithdrawal(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-drivers"] });
+      setSelectedDriver(null);
       setRejectionReason("");
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/withdrawals"] });
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Erreur",
-        description: "Impossible de rejeter le retrait",
+        description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const formatAmount = (amount: string | number) => {
-    return new Intl.NumberFormat('fr-FR').format(Number(amount));
-  };
-
-  const handleApprove = (withdrawalId: number) => {
-    if (confirm("Confirmer l'approbation de ce retrait ?")) {
-      approveWithdrawalMutation.mutate(withdrawalId);
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">En attente</Badge>;
+      case "approved":
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Approuvé</Badge>;
+      case "rejected":
+        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Refusé</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
-  const handleReject = () => {
-    if (!rejectionReason.trim()) {
-      toast({
-        title: "Raison requise",
-        description: "Veuillez indiquer la raison du rejet",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    rejectWithdrawalMutation.mutate({
-      withdrawalId: selectedWithdrawal.id,
-      reason: rejectionReason
-    });
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    }).format(amount);
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navigation />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <i className="fas fa-spinner fa-spin text-4xl text-mako-green mb-4"></i>
-            <p className="text-gray-600">Chargement du panneau d'administration...</p>
-          </div>
-        </div>
-        <Footer />
-        <MobileNav />
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navigation />
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Panneau d'Administration
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Bienvenue Zeinab - Gérez MAKOEXPRESS et surveillez les revenus
-          </p>
-        </div>
-
-        {/* Revenue Summary */}
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6 mb-8">
-          <Card className="border-green-200 bg-gradient-to-br from-green-50 to-green-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center text-green-800">
-                <i className="fas fa-coins mr-2"></i>
-                Commissions Totales
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-900">
-                {formatAmount(dashboardData?.totalCommissions || 0)} FCFA
-              </div>
-              <p className="text-sm text-green-700">20% de chaque livraison</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center text-blue-800">
-                <i className="fas fa-calendar-day mr-2"></i>
-                Aujourd'hui
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-900">
-                {formatAmount(dashboardData?.todayCommissions || 0)} FCFA
-              </div>
-              <p className="text-sm text-blue-700">Commissions du jour</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center text-purple-800">
-                <i className="fas fa-chart-line mr-2"></i>
-                Croissance
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-900">
-                +{dashboardData?.monthlyGrowth || 0}%
-              </div>
-              <p className="text-sm text-purple-700">Ce mois-ci</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center text-orange-800">
-                <i className="fas fa-exclamation-triangle mr-2"></i>
-                En Attente
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-900">
-                {dashboardData?.pendingWithdrawals || 0}
-              </div>
-              <p className="text-sm text-orange-700">Retraits à traiter</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Pending Withdrawals */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <i className="fas fa-hand-holding-dollar mr-2 text-mako-green"></i>
-                  Demandes de Retrait en Attente
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {pendingWithdrawals && pendingWithdrawals.length > 0 ? (
-                  <div className="space-y-4">
-                    {pendingWithdrawals.map((withdrawal: any) => (
-                      <div
-                        key={withdrawal.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">
-                              {withdrawal.driverName}
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              {withdrawal.driverPhone}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-lg font-bold text-mako-green">
-                              {formatAmount(withdrawal.amount)} FCFA
-                            </div>
-                            <p className="text-xs text-gray-600">
-                              Vers: {withdrawal.makoPayAccount}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="text-xs text-gray-600 mb-3">
-                          Demandé le {new Date(withdrawal.requestDate).toLocaleString('fr-FR')}
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleApprove(withdrawal.id)}
-                            disabled={approveWithdrawalMutation.isPending}
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            <i className="fas fa-check mr-1"></i>
-                            Approuver
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setSelectedWithdrawal(withdrawal)}
-                            className="border-red-200 text-red-600 hover:bg-red-50"
-                          >
-                            <i className="fas fa-times mr-1"></i>
-                            Rejeter
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <i className="fas fa-check-circle text-4xl text-green-400 mb-4"></i>
-                    <p className="text-gray-600">Aucune demande en attente</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Statistics and Top Drivers */}
-          <div className="space-y-6">
-            {/* Quick Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <i className="fas fa-chart-bar mr-2 text-mako-green"></i>
-                  Statistiques Rapides
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Commandes totales</span>
-                  <span className="font-semibold">{dashboardData?.totalOrders || 0}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Livreurs actifs</span>
-                  <span className="font-semibold">{dashboardData?.activeDrivers || 0}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Chiffre d'affaires</span>
-                  <span className="font-semibold">
-                    {formatAmount(dashboardData?.totalRevenue || 0)} FCFA
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Top Drivers */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <i className="fas fa-trophy mr-2 text-mako-green"></i>
-                  Meilleurs Livreurs
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {dashboardData?.topDrivers && dashboardData.topDrivers.length > 0 ? (
-                  <div className="space-y-3">
-                    {dashboardData.topDrivers.map((driver: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                            index === 0 ? 'bg-yellow-100 text-yellow-800' :
-                            index === 1 ? 'bg-gray-100 text-gray-800' :
-                            'bg-orange-100 text-orange-800'
-                          }`}>
-                            {index + 1}
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">{driver.name}</p>
-                            <p className="text-xs text-gray-600">{driver.orders} livraisons</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-sm">
-                            {formatAmount(driver.earnings)} FCFA
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-600 text-sm">Aucune donnée disponible</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Rejection Modal */}
-        {selectedWithdrawal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-              <h3 className="text-lg font-semibold mb-4">
-                Rejeter la demande de retrait
-              </h3>
-              
-              <div className="mb-4">
-                <p className="text-sm text-gray-600 mb-2">
-                  Livreur: <strong>{selectedWithdrawal.driverName}</strong>
-                </p>
-                <p className="text-sm text-gray-600 mb-2">
-                  Montant: <strong>{formatAmount(selectedWithdrawal.amount)} FCFA</strong>
-                </p>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Raison du rejet *
-                </label>
-                <Textarea
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="Expliquez pourquoi ce retrait est rejeté..."
-                  className="w-full"
-                  rows={3}
-                />
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Button
-                  onClick={handleReject}
-                  disabled={rejectWithdrawalMutation.isPending || !rejectionReason.trim()}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  {rejectWithdrawalMutation.isPending ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin mr-2"></i>
-                      Rejet...
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-times mr-2"></i>
-                      Rejeter
-                    </>
-                  )}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <Link href="/">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Retour
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedWithdrawal(null);
-                    setRejectionReason("");
-                  }}
-                >
-                  Annuler
-                </Button>
-              </div>
+              </Link>
+              <h1 className="text-2xl font-bold text-gray-900">Panneau d'Administration</h1>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                Administrateur
+              </Badge>
             </div>
           </div>
-        )}
-
-        {/* Commission Breakdown Visualization */}
-        <div className="mt-8">
-          <CommissionBreakdownChart
-            data={[
-              {
-                orderId: "ORD-001",
-                totalAmount: 5000,
-                adminCommission: 1000,
-                driverPortion: 4000,
-                date: new Date().toISOString(),
-                customerName: "Aminata Traoré"
-              },
-              {
-                orderId: "ORD-002",
-                totalAmount: 3500,
-                adminCommission: 700,
-                driverPortion: 2800,
-                date: new Date(Date.now() - 86400000).toISOString(),
-                customerName: "Ibrahim Keita"
-              },
-              {
-                orderId: "ORD-003",
-                totalAmount: 7500,
-                adminCommission: 1500,
-                driverPortion: 6000,
-                date: new Date(Date.now() - 172800000).toISOString(),
-                customerName: "Fatoumata Diallo"
-              },
-              {
-                orderId: "ORD-004",
-                totalAmount: 2000,
-                adminCommission: 400,
-                driverPortion: 1600,
-                date: new Date(Date.now() - 259200000).toISOString(),
-                customerName: "Moussa Coulibaly"
-              },
-              {
-                orderId: "ORD-005",
-                totalAmount: 4200,
-                adminCommission: 840,
-                driverPortion: 3360,
-                date: new Date(Date.now() - 345600000).toISOString(),
-                customerName: "Aïcha Sangaré"
-              }
-            ]}
-          />
         </div>
       </div>
 
-      <Footer />
-      <MobileNav />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Package className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Commandes totales</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {statsLoading ? "..." : adminStats?.totalOrders || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Users className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Livreurs actifs</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {statsLoading ? "..." : adminStats?.activeDrivers || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <Clock className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">En attente</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {statsLoading ? "..." : adminStats?.pendingDrivers || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <DollarSign className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Commission mensuelle</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {statsLoading ? "..." : formatCurrency(adminStats?.monthlyCommission || 0)}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="drivers" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="drivers">Gestion des Livreurs</TabsTrigger>
+            <TabsTrigger value="commissions">Commissions</TabsTrigger>
+          </TabsList>
+
+          {/* Drivers Management Tab */}
+          <TabsContent value="drivers" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Livreurs en attente d'approbation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {driversLoading ? (
+                  <div className="text-center py-8">Chargement...</div>
+                ) : pendingDrivers?.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    Aucun livreur en attente d'approbation
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nom complet</TableHead>
+                          <TableHead>Téléphone</TableHead>
+                          <TableHead>Type de véhicule</TableHead>
+                          <TableHead>Statut</TableHead>
+                          <TableHead>Date de soumission</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {pendingDrivers?.map((driver: Driver) => (
+                          <TableRow key={driver.id}>
+                            <TableCell className="font-medium">{driver.fullName}</TableCell>
+                            <TableCell>{driver.phone}</TableCell>
+                            <TableCell>{driver.vehicleType}</TableCell>
+                            <TableCell>{getStatusBadge(driver.status)}</TableCell>
+                            <TableCell>
+                              {new Date(driver.submissionDate).toLocaleDateString('fr-FR')}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => setSelectedDriver(driver)}
+                                    >
+                                      <Eye className="w-4 h-4 mr-1" />
+                                      Voir
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-2xl">
+                                    <DialogHeader>
+                                      <DialogTitle>Détails du livreur - {selectedDriver?.fullName}</DialogTitle>
+                                      <DialogDescription>
+                                        Vérifiez les informations et documents soumis
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    
+                                    {selectedDriver && (
+                                      <div className="space-y-6">
+                                        {/* Personal Information */}
+                                        <div className="grid grid-cols-2 gap-4">
+                                          <div>
+                                            <label className="text-sm font-medium text-gray-600">Nom complet</label>
+                                            <p className="text-sm text-gray-900">{selectedDriver.fullName}</p>
+                                          </div>
+                                          <div>
+                                            <label className="text-sm font-medium text-gray-600">Téléphone</label>
+                                            <p className="text-sm text-gray-900">{selectedDriver.phone}</p>
+                                          </div>
+                                          <div>
+                                            <label className="text-sm font-medium text-gray-600">Numéro d'identité</label>
+                                            <p className="text-sm text-gray-900">{selectedDriver.identityNumber}</p>
+                                          </div>
+                                          <div>
+                                            <label className="text-sm font-medium text-gray-600">Type d'identité</label>
+                                            <p className="text-sm text-gray-900">{selectedDriver.identityType}</p>
+                                          </div>
+                                        </div>
+
+                                        {/* Vehicle Information */}
+                                        <div className="grid grid-cols-2 gap-4">
+                                          <div>
+                                            <label className="text-sm font-medium text-gray-600">Type de véhicule</label>
+                                            <p className="text-sm text-gray-900">{selectedDriver.vehicleType}</p>
+                                          </div>
+                                          <div>
+                                            <label className="text-sm font-medium text-gray-600">Immatriculation</label>
+                                            <p className="text-sm text-gray-900">{selectedDriver.vehicleRegistration}</p>
+                                          </div>
+                                        </div>
+
+                                        {/* Documents */}
+                                        <div className="space-y-3">
+                                          <h4 className="font-medium text-gray-900">Documents soumis</h4>
+                                          <div className="grid grid-cols-1 gap-2">
+                                            {selectedDriver.selfiePhotoUrl && (
+                                              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <span className="text-sm">Photo selfie</span>
+                                                <Button variant="outline" size="sm">
+                                                  <Download className="w-4 h-4 mr-1" />
+                                                  Télécharger
+                                                </Button>
+                                              </div>
+                                            )}
+                                            {selectedDriver.identityDocumentUrl && (
+                                              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <span className="text-sm">Document d'identité</span>
+                                                <Button variant="outline" size="sm">
+                                                  <Download className="w-4 h-4 mr-1" />
+                                                  Télécharger
+                                                </Button>
+                                              </div>
+                                            )}
+                                            {selectedDriver.healthCertificateUrl && (
+                                              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <span className="text-sm">Certificat médical</span>
+                                                <Button variant="outline" size="sm">
+                                                  <Download className="w-4 h-4 mr-1" />
+                                                  Télécharger
+                                                </Button>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex space-x-4 pt-4">
+                                          <Button
+                                            onClick={() => approveDriverMutation.mutate(selectedDriver.id)}
+                                            disabled={approveDriverMutation.isPending}
+                                            className="bg-green-600 hover:bg-green-700"
+                                          >
+                                            <CheckCircle className="w-4 h-4 mr-2" />
+                                            Approuver
+                                          </Button>
+                                          
+                                          <Dialog>
+                                            <DialogTrigger asChild>
+                                              <Button variant="destructive">
+                                                <XCircle className="w-4 h-4 mr-2" />
+                                                Refuser
+                                              </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                              <DialogHeader>
+                                                <DialogTitle>Refuser le livreur</DialogTitle>
+                                                <DialogDescription>
+                                                  Veuillez fournir une raison pour le refus
+                                                </DialogDescription>
+                                              </DialogHeader>
+                                              <div className="space-y-4">
+                                                <Textarea
+                                                  placeholder="Raison du refus..."
+                                                  value={rejectionReason}
+                                                  onChange={(e) => setRejectionReason(e.target.value)}
+                                                />
+                                                <div className="flex space-x-2">
+                                                  <Button
+                                                    onClick={() => rejectDriverMutation.mutate({ 
+                                                      driverId: selectedDriver.id, 
+                                                      reason: rejectionReason 
+                                                    })}
+                                                    disabled={rejectDriverMutation.isPending || !rejectionReason.trim()}
+                                                    variant="destructive"
+                                                  >
+                                                    Confirmer le refus
+                                                  </Button>
+                                                </div>
+                                              </div>
+                                            </DialogContent>
+                                          </Dialog>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </DialogContent>
+                                </Dialog>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Commissions Tab */}
+          <TabsContent value="commissions" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Revenus ce mois</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Commissions totales</span>
+                      <span className="font-semibold">
+                        {formatCurrency(adminStats?.monthlyCommission || 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Revenus bruts</span>
+                      <span className="font-semibold">
+                        {formatCurrency(adminStats?.totalRevenue || 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Commandes complétées</span>
+                      <span className="font-semibold">{adminStats?.completedToday || 0}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Statistiques des commissions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Taux de commission standard</span>
+                      <span className="font-semibold">20%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Taux de commission premium</span>
+                      <span className="font-semibold">30%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Commande moyenne</span>
+                      <span className="font-semibold">
+                        {formatCurrency((adminStats?.totalRevenue || 0) / Math.max(adminStats?.totalOrders || 1, 1))}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Commission breakdown chart placeholder */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Évolution des commissions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 flex items-center justify-center text-gray-500">
+                  Graphique des commissions (à venir)
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
