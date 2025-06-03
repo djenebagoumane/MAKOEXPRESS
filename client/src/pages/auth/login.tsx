@@ -154,7 +154,7 @@ export default function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+                  className="w-full bg-white text-mako-green border border-mako-green hover:bg-mako-green hover:text-white transition-colors font-semibold py-3 rounded-lg"
                   disabled={loginMutation.isPending}
                 >
                   {loginMutation.isPending ? "Connexion..." : "Se connecter"}
@@ -163,7 +163,7 @@ export default function LoginPage() {
             </Form>
 
             <div className="mt-4 text-center space-y-2">
-              <Link href="/auth/forgot-password" className="text-green-600 hover:underline text-sm block mb-4">
+              <Link href="/auth/forgot-password" className="text-mako-green:underline text-sm block mb-4">
                 Mot de passe oublié ?
               </Link>
               
