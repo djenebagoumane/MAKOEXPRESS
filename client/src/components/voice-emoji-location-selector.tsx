@@ -21,61 +21,85 @@ interface VoiceEmojiLocationSelectorProps {
   className?: string;
 }
 
+interface VoiceMessage {
+  fr: string;
+  bm: string; // Bambara
+}
+
+const VOICE_MESSAGES: Record<string, VoiceMessage> = {
+  start: {
+    fr: "Dites le lieu que vous cherchez",
+    bm: "Yoro min b'a fɛ, o fɔ"
+  },
+  selected: {
+    fr: "sélectionné",
+    bm: "sugandi"
+  },
+  notRecognized: {
+    fr: "Lieu non reconnu, essayez à nouveau", 
+    bm: "Yoro ma dɔn, segin-ka kɛ"
+  },
+  examples: {
+    fr: "Essayez de dire: maison, bureau, école, hôpital",
+    bm: "Segin ni: so, baara yoro, kalan yoro, dɔgɔtɔrɔ so"
+  }
+};
+
 const LOCATION_EMOJIS: LocationEmoji[] = [
   {
     id: "home",
-    name: "Maison",
+    name: "Maison / So",
     emoji: "🏠",
-    keywords: ["maison", "home", "domicile", "chez moi"],
+    keywords: ["maison", "home", "domicile", "chez moi", "so", "du", "na so"],
     coordinates: { lat: 12.6392, lng: -8.0029 }
   },
   {
     id: "office",
-    name: "Bureau",
+    name: "Bureau / Baara yoro",
     emoji: "🏢",
-    keywords: ["bureau", "office", "travail", "boulot"],
+    keywords: ["bureau", "office", "travail", "boulot", "baara", "baara yoro", "baro"],
     coordinates: { lat: 12.6528, lng: -7.9916 }
   },
   {
     id: "school",
-    name: "École",
+    name: "École / Kalan yoro",
     emoji: "🏫",
-    keywords: ["école", "school", "université", "campus"],
+    keywords: ["école", "school", "université", "campus", "kalan", "kalan yoro", "lakol"],
     coordinates: { lat: 12.6461, lng: -8.0134 }
   },
   {
     id: "hospital",
-    name: "Hôpital",
+    name: "Hôpital / Dɔgɔtɔrɔ so",
     emoji: "🏥",
-    keywords: ["hôpital", "hospital", "clinique", "médecin"],
+    keywords: ["hôpital", "hospital", "clinique", "médecin", "dɔgɔtɔrɔ", "dɔgɔtɔrɔ so", "fura yoro"],
     coordinates: { lat: 12.6398, lng: -7.9921 }
   },
   {
     id: "market",
-    name: "Marché",
+    name: "Marché / Sugu",
     emoji: "🏪",
-    keywords: ["marché", "market", "magasin", "boutique"],
+    keywords: ["marché", "market", "magasin", "boutique", "sugu", "feere yoro", "sangaji"],
     coordinates: { lat: 12.6501, lng: -8.0087 }
   },
   {
     id: "restaurant",
-    name: "Restaurant",
+    name: "Restaurant / Dumuni yoro",
     emoji: "🍽️",
-    keywords: ["restaurant", "manger", "nourriture", "repas"],
+    keywords: ["restaurant", "manger", "nourriture", "repas", "dumuni", "dumuni yoro", "balimaya"],
     coordinates: { lat: 12.6445, lng: -7.9998 }
   },
   {
     id: "airport",
-    name: "Aéroport",
+    name: "Aéroport / Sankaba yoro",
     emoji: "✈️",
-    keywords: ["aéroport", "airport", "avion", "vol"],
+    keywords: ["aéroport", "airport", "avion", "vol", "sankaba", "sankaba yoro", "degen yoro"],
     coordinates: { lat: 12.5336, lng: -7.9499 }
   },
   {
     id: "mosque",
-    name: "Mosquée",
+    name: "Mosquée / Misiri",
     emoji: "🕌",
-    keywords: ["mosquée", "mosque", "prière", "religion"],
+    keywords: ["mosquée", "mosque", "prière", "religion", "misiri", "salida yoro", "alamudulillahi"],
     coordinates: { lat: 12.6512, lng: -8.0156 }
   }
 ];
@@ -88,6 +112,7 @@ export default function VoiceEmojiLocationSelector({
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [recognition, setRecognition] = useState<any>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<'fr' | 'bm'>('bm');
   const { toast } = useToast();
   const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -98,12 +123,14 @@ export default function VoiceEmojiLocationSelector({
       
       recognitionInstance.continuous = false;
       recognitionInstance.interimResults = false;
-      recognitionInstance.lang = 'fr-FR';
+      // Note: Browser speech recognition may not support Bambara directly, 
+      // but we'll use French as fallback while handling Bambara keywords
+      recognitionInstance.lang = selectedLanguage === 'bm' ? 'fr-FR' : 'fr-FR';
       
       recognitionInstance.onstart = () => {
         setIsListening(true);
         setTranscript("");
-        speakText("Dites le lieu que vous cherchez");
+        speakText(VOICE_MESSAGES.start[selectedLanguage]);
       };
       
       recognitionInstance.onresult = (event: any) => {
@@ -115,16 +142,19 @@ export default function VoiceEmojiLocationSelector({
         const matchedLocation = findLocationByVoice(spokenText);
         if (matchedLocation) {
           onLocationSelect(matchedLocation);
-          speakText(`${matchedLocation.name} sélectionné`);
+          const selectedMessage = selectedLanguage === 'bm' 
+            ? `${matchedLocation.name.split(' / ')[1] || matchedLocation.name} ${VOICE_MESSAGES.selected[selectedLanguage]}`
+            : `${matchedLocation.name.split(' / ')[0]} ${VOICE_MESSAGES.selected[selectedLanguage]}`;
+          speakText(selectedMessage);
           toast({
-            title: "Lieu sélectionné",
+            title: selectedLanguage === 'bm' ? "Yoro sugandi" : "Lieu sélectionné",
             description: `${matchedLocation.emoji} ${matchedLocation.name}`,
           });
         } else {
-          speakText("Lieu non reconnu, essayez à nouveau");
+          speakText(VOICE_MESSAGES.notRecognized[selectedLanguage]);
           toast({
-            title: "Lieu non reconnu",
-            description: "Essayez de dire: maison, bureau, école, hôpital...",
+            title: selectedLanguage === 'bm' ? "Yoro ma dɔn" : "Lieu non reconnu",
+            description: VOICE_MESSAGES.examples[selectedLanguage],
             variant: "destructive",
           });
         }
@@ -165,8 +195,11 @@ export default function VoiceEmojiLocationSelector({
   const speakText = (text: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
+      // Use French voice for both languages since Bambara TTS is not widely supported
+      // but we'll speak the Bambara words with French pronunciation
       utterance.lang = 'fr-FR';
       utterance.rate = 0.8;
+      utterance.pitch = 1;
       speechSynthesis.speak(utterance);
     }
   };
@@ -205,6 +238,31 @@ export default function VoiceEmojiLocationSelector({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Language Selector */}
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-mako-green">
+            {selectedLanguage === 'bm' ? 'Kuma-kan sugandi' : 'Sélection de langue'}
+          </h3>
+          <div className="flex gap-2">
+            <Button
+              variant={selectedLanguage === 'fr' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedLanguage('fr')}
+              className={selectedLanguage === 'fr' ? 'bg-mako-green text-white' : 'text-mako-green border-mako-green'}
+            >
+              🇫🇷 Français
+            </Button>
+            <Button
+              variant={selectedLanguage === 'bm' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedLanguage('bm')}
+              className={selectedLanguage === 'bm' ? 'bg-mako-green text-white' : 'text-mako-green border-mako-green'}
+            >
+              🇲🇱 Bamanankan
+            </Button>
+          </div>
+        </div>
+
         {/* Voice Control */}
         <div className="flex items-center gap-4">
           <Button
@@ -219,19 +277,21 @@ export default function VoiceEmojiLocationSelector({
             {isListening ? (
               <>
                 <MicOff className="w-4 h-4" />
-                Arrêter
+                {selectedLanguage === 'bm' ? 'Dabɔ' : 'Arrêter'}
               </>
             ) : (
               <>
                 <Mic className="w-4 h-4" />
-                Parler
+                {selectedLanguage === 'bm' ? 'Kuma' : 'Parler'}
               </>
             )}
           </Button>
           
           {transcript && (
             <div className="flex-1 p-2 bg-gray-100 rounded-lg">
-              <span className="text-sm text-gray-600">Vous avez dit: </span>
+              <span className="text-sm text-gray-600">
+                {selectedLanguage === 'bm' ? 'I ye fɔ: ' : 'Vous avez dit: '}
+              </span>
               <span className="font-medium">{transcript}</span>
             </div>
           )}
@@ -245,7 +305,9 @@ export default function VoiceEmojiLocationSelector({
                 <span className="text-2xl">{selectedLocation.emoji}</span>
                 <div>
                   <h3 className="font-medium text-mako-green">{selectedLocation.name}</h3>
-                  <p className="text-sm text-gray-600">Lieu sélectionné</p>
+                  <p className="text-sm text-gray-600">
+                    {selectedLanguage === 'bm' ? 'Yoro sugandi' : 'Lieu sélectionné'}
+                  </p>
                 </div>
               </div>
               <Button
