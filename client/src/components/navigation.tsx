@@ -25,52 +25,42 @@ export default function Navigation() {
               <Link href="/" className="text-white hover:text-mako-light transition-colors">
                 Accueil
               </Link>
-              
-              {user?.role === 'admin' ? (
-                // Navigation pour administrateur
-                <>
-                  <Link href="/admin" className="text-white hover:text-mako-light transition-colors">
-                    <i className="fas fa-cog mr-1"></i>
-                    Administration
+              <div className="relative group">
+                <span className="text-white hover:text-mako-light transition-colors cursor-pointer">
+                  Livraison
+                  <i className="fas fa-chevron-down ml-1 text-xs"></i>
+                </span>
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-mako-silver opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <Link href="/delivery/express" className="block px-4 py-3 text-mako-anthracite hover:bg-mako-green hover:text-white transition-colors">
+                    <i className="fas fa-bolt mr-2"></i>
+                    Livraison Express
                   </Link>
-                  <Link href="/customer-account" className="text-white hover:text-mako-light transition-colors">
-                    <i className="fas fa-user-circle mr-1"></i>
-                    Mon Profil
+                  <Link href="/delivery/standard" className="block px-4 py-3 text-mako-anthracite hover:bg-mako-green hover:text-white transition-colors">
+                    <i className="fas fa-truck mr-2"></i>
+                    Livraison Standard
                   </Link>
-                </>
-              ) : (
-                // Navigation pour client standard
-                <>
-                  <div className="relative group">
-                    <span className="text-white hover:text-mako-light transition-colors cursor-pointer">
-                      Livraison
-                      <i className="fas fa-chevron-down ml-1 text-xs"></i>
-                    </span>
-                    <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-mako-silver opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                      <Link href="/delivery/express" className="block px-4 py-3 text-mako-anthracite hover:bg-mako-green hover:text-white transition-colors">
-                        <i className="fas fa-bolt mr-2"></i>
-                        Livraison Express
-                      </Link>
-                      <Link href="/delivery/standard" className="block px-4 py-3 text-mako-anthracite hover:bg-mako-green hover:text-white transition-colors">
-                        <i className="fas fa-truck mr-2"></i>
-                        Livraison Standard
-                      </Link>
-                    </div>
-                  </div>
-                  <Link href="/tracking" className="text-white hover:text-mako-light transition-colors">
-                    <i className="fas fa-search mr-1"></i>
-                    Suivi de Colis
-                  </Link>
-                  <Link href="/customer-account" className="text-white hover:text-mako-light transition-colors">
-                    <i className="fas fa-user-circle mr-1"></i>
-                    Mon Compte
-                  </Link>
-                  <Link href="/driver/register" className="text-white hover:text-mako-light transition-colors">
-                    <i className="fas fa-motorcycle mr-1"></i>
-                    Devenir Livreur
-                  </Link>
-                </>
-              )}
+                </div>
+              </div>
+              <Link href="/tracking" className="text-white hover:text-mako-light transition-colors">
+                <i className="fas fa-search mr-1"></i>
+                Suivi de Colis
+              </Link>
+              <Link href="/ai-recommendations" className="text-white hover:text-mako-light transition-colors">
+                <i className="fas fa-brain mr-1"></i>
+                Recommandations IA
+              </Link>
+              <Link href="/customer-account" className="text-white hover:text-mako-light transition-colors">
+                <i className="fas fa-user-circle mr-1"></i>
+                Mon Compte
+              </Link>
+              <Link href="/driver/register" className="text-white hover:text-mako-light transition-colors">
+                <i className="fas fa-motorcycle mr-1"></i>
+                Devenir Livreur
+              </Link>
+              <Link href="/admin" className="text-white hover:text-mako-light transition-colors">
+                <i className="fas fa-cog mr-1"></i>
+                Admin
+              </Link>
             </nav>
           )}
           
@@ -154,73 +144,62 @@ export default function Navigation() {
                 <i className="fas fa-home mr-2"></i>
                 Accueil
               </Link>
-
-              {user?.role === 'admin' ? (
-                // Menu mobile pour administrateur
-                <>
-                  <Link 
-                    href="/admin" 
-                    className="block px-3 py-2 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-md transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <i className="fas fa-cog mr-2"></i>
-                    Administration
-                  </Link>
-                  <Link 
-                    href="/customer-account" 
-                    className="block px-3 py-2 text-purple-600 hover:bg-purple-100 hover:text-purple-700 rounded-md transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <i className="fas fa-user-circle mr-2"></i>
-                    Mon Profil
-                  </Link>
-                </>
-              ) : (
-                // Menu mobile pour client standard
-                <>
-                  <Link 
-                    href="/delivery/express" 
-                    className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <i className="fas fa-bolt mr-2"></i>
-                    Livraison Express
-                  </Link>
-                  <Link 
-                    href="/delivery/standard" 
-                    className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <i className="fas fa-truck mr-2"></i>
-                    Livraison Standard
-                  </Link>
-                  <Link 
-                    href="/tracking" 
-                    className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <i className="fas fa-search mr-2"></i>
-                    Suivi de Colis
-                  </Link>
-                  <Link 
-                    href="/customer-account" 
-                    className="block px-3 py-2 text-purple-600 hover:bg-purple-100 hover:text-purple-700 rounded-md transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <i className="fas fa-user-circle mr-2"></i>
-                    Mon Compte
-                  </Link>
-                  <Link 
-                    href="/driver/register" 
-                    className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <i className="fas fa-motorcycle mr-2"></i>
-                    Devenir Livreur
-                  </Link>
-                </>
-              )}
-
+              <Link 
+                href="/delivery/express" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-bolt mr-2"></i>
+                Livraison Express
+              </Link>
+              <Link 
+                href="/delivery/standard" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-truck mr-2"></i>
+                Livraison Standard
+              </Link>
+              <Link 
+                href="/tracking" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-search mr-2"></i>
+                Suivi de Colis
+              </Link>
+              <Link 
+                href="/ai-recommendations" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-brain mr-2"></i>
+                Recommandations IA
+              </Link>
+              <Link 
+                href="/customer-account" 
+                className="block px-3 py-2 text-purple-600 hover:bg-purple-100 hover:text-purple-700 rounded-md transition-colors font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-user-circle mr-2"></i>
+                Mon Compte
+              </Link>
+              <Link 
+                href="/driver/register" 
+                className="block px-3 py-2 text-mako-anthracite hover:bg-mako-green hover:text-white rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-motorcycle mr-2"></i>
+                Devenir Livreur
+              </Link>
+              <Link 
+                href="/admin" 
+                className="block px-3 py-2 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-md transition-colors font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <i className="fas fa-cog mr-2"></i>
+                Administration
+              </Link>
               <div className="border-t border-mako-silver pt-2 mt-2">
                 <button 
                   onClick={() => {
