@@ -41,7 +41,7 @@ export default function Login() {
             <h1 className="text-4xl font-bold text-white">
               MAKOEXPRESS
             </h1>
-            <p className="text-xl text-green-100">
+            <p className="text-xl text-white opacity-90">
               Connexion sécurisée à votre compte
             </p>
           </div>
@@ -65,8 +65,8 @@ export default function Login() {
         {/* Login Form */}
         <Card className="w-full max-w-md mx-auto">
           <CardHeader>
-            <CardTitle>Se connecter</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-mako-green">Se connecter</CardTitle>
+            <CardDescription className="text-mako-green opacity-80">
               Accédez à votre compte MAKOEXPRESS
             </CardDescription>
           </CardHeader>
@@ -80,7 +80,7 @@ export default function Login() {
                   name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email ou numéro de téléphone</FormLabel>
+                      <FormLabel className="text-mako-green font-medium">Email ou numéro de téléphone</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="votre@email.com ou +223XXXXXXXX" 
@@ -98,7 +98,7 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mot de passe</FormLabel>
+                      <FormLabel className="text-mako-green font-medium">Mot de passe</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -137,19 +137,19 @@ export default function Login() {
             </Form>
 
             <div className="mt-4 text-center space-y-2">
-              <Link href="/auth/forgot-password" className="text-mako-green hover:underline text-sm block mb-4">
+              <Link href="/auth/forgot-password" className="text-mako-green hover:underline text-sm block mb-4 font-medium">
                 Mot de passe oublié ?
               </Link>
               
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Vous n'avez pas de compte ?{" "}
-                <Link href="/auth/register" className="text-mako-green hover:underline">
+                <Link href="/auth/register" className="text-mako-green hover:underline font-semibold">
                   Créer un compte
                 </Link>
               </p>
               
-              <div className="pt-4 border-t">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="pt-4 border-t border-mako-green/20">
+                <p className="text-xs text-mako-green/70">
                   Authentification sécurisée avec validation par pays
                 </p>
               </div>
