@@ -45,7 +45,6 @@ const translations = {
     orders: "Commandes",
     preferences: "Préférences",
     personalInfo: "Informations personnelles",
-    contactInfo: "Informations de contact",
     language: "Langue",
     orderHistory: "Historique des commandes",
     noOrders: "Aucune commande trouvée",
@@ -73,7 +72,11 @@ const translations = {
     selectLanguage: "Sélectionner la langue",
     updateSuccess: "Mise à jour réussie",
     updateError: "Erreur de mise à jour",
-    back: "Retour"
+    back: "Retour",
+    totalOrders: "Commandes totales",
+    completedOrders: "Commandes terminées",
+    totalSpent: "Total dépensé",
+    accountSummary: "Résumé du compte"
   },
   bm: {
     myAccount: "N ka Konti",
@@ -81,7 +84,6 @@ const translations = {
     orders: "Baarakɛlaw",
     preferences: "Fɛɛrɛw",
     personalInfo: "Mɔgɔ kunnafoniw",
-    contactInfo: "Kunnafoni kɛlaw",
     language: "Kan",
     orderHistory: "Baara kɔrɔlen",
     noOrders: "Baara si tɛ",
@@ -109,7 +111,11 @@ const translations = {
     selectLanguage: "Kan sugandi",
     updateSuccess: "Yɛlɛma ɲuman",
     updateError: "Yɛlɛma fili",
-    back: "Segin"
+    back: "Segin",
+    totalOrders: "Baara bɛɛ",
+    completedOrders: "Baara bannenw",
+    totalSpent: "Wari bɛɛ",
+    accountSummary: "Konti kunnafoni"
   },
   en: {
     myAccount: "My Account",
@@ -117,7 +123,6 @@ const translations = {
     orders: "Orders",
     preferences: "Preferences",
     personalInfo: "Personal Information",
-    contactInfo: "Contact Information",
     language: "Language",
     orderHistory: "Order History",
     noOrders: "No orders found",
@@ -145,7 +150,11 @@ const translations = {
     selectLanguage: "Select Language",
     updateSuccess: "Update successful",
     updateError: "Update error",
-    back: "Back"
+    back: "Back",
+    totalOrders: "Total Orders",
+    completedOrders: "Completed Orders",
+    totalSpent: "Total Spent",
+    accountSummary: "Account Summary"
   },
   ar: {
     myAccount: "حسابي",
@@ -153,7 +162,6 @@ const translations = {
     orders: "الطلبات",
     preferences: "التفضيلات",
     personalInfo: "المعلومات الشخصية",
-    contactInfo: "معلومات الاتصال",
     language: "اللغة",
     orderHistory: "تاريخ الطلبات",
     noOrders: "لا توجد طلبات",
@@ -181,7 +189,11 @@ const translations = {
     selectLanguage: "اختر اللغة",
     updateSuccess: "تم التحديث بنجاح",
     updateError: "خطأ في التحديث",
-    back: "العودة"
+    back: "العودة",
+    totalOrders: "إجمالي الطلبات",
+    completedOrders: "الطلبات المكتملة",
+    totalSpent: "إجمالي المنفق",
+    accountSummary: "ملخص الحساب"
   }
 };
 
@@ -228,9 +240,8 @@ export default function CustomerAccount() {
 
   // Charger la langue sauvegardée
   useEffect(() => {
-    if (preferences?.language) {
-      setLanguage(preferences.language);
-    }
+    const savedLanguage = preferences?.language || localStorage.getItem('makoexpress-language') || 'fr';
+    setLanguage(savedLanguage);
   }, [preferences]);
 
   // Mutation pour mettre à jour le profil
@@ -240,6 +251,7 @@ export default function CustomerAccount() {
       return res.json();
     },
     onSuccess: () => {
+      const t = translations[language as keyof typeof translations] || translations.fr;
       toast({
         title: t.updateSuccess,
         description: "Vos informations ont été mises à jour avec succès.",
@@ -248,6 +260,7 @@ export default function CustomerAccount() {
       setIsEditing(false);
     },
     onError: () => {
+      const t = translations[language as keyof typeof translations] || translations.fr;
       toast({
         title: t.updateError,
         description: "Impossible de mettre à jour le profil.",
@@ -263,6 +276,7 @@ export default function CustomerAccount() {
       return res.json();
     },
     onSuccess: () => {
+      const t = translations[language as keyof typeof translations] || translations.fr;
       toast({
         title: t.updateSuccess,
         description: "Vos préférences ont été mises à jour.",
@@ -270,6 +284,7 @@ export default function CustomerAccount() {
       queryClient.invalidateQueries({ queryKey: ["/api/user/preferences"] });
     },
     onError: () => {
+      const t = translations[language as keyof typeof translations] || translations.fr;
       toast({
         title: t.updateError,
         description: "Impossible de mettre à jour les préférences.",
@@ -287,6 +302,7 @@ export default function CustomerAccount() {
 
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
+    localStorage.setItem('makoexpress-language', newLanguage);
     updatePreferencesMutation.mutate({ language: newLanguage });
   };
 
@@ -314,8 +330,20 @@ export default function CustomerAccount() {
     return new Date(dateString).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'fr-FR');
   };
 
+  // Calculer les statistiques
+  const totalOrders = Array.isArray(orders) ? orders.length : 0;
+  const completedOrders = Array.isArray(orders) ? orders.filter((o: any) => o.status === 'completed').length : 0;
+  const totalSpent = Array.isArray(orders) ? orders.reduce((sum: number, order: any) => sum + (order.price || 0), 0) : 0;
+
   if (!user) {
-    return <div>Chargement...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p>Chargement...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -474,6 +502,32 @@ export default function CustomerAccount() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Résumé du compte */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{t.accountSummary}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <Package className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                    <div className="text-2xl font-bold text-blue-900">{totalOrders}</div>
+                    <div className="text-sm text-blue-600">{t.totalOrders}</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <Star className="w-8 h-8 mx-auto mb-2 text-green-600" />
+                    <div className="text-2xl font-bold text-green-900">{completedOrders}</div>
+                    <div className="text-sm text-green-600">{t.completedOrders}</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <Calendar className="w-8 h-8 mx-auto mb-2 text-purple-600" />
+                    <div className="text-2xl font-bold text-purple-900">{formatCurrency(totalSpent)}</div>
+                    <div className="text-sm text-purple-600">{t.totalSpent}</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Orders Tab */}
@@ -487,8 +541,11 @@ export default function CustomerAccount() {
               </CardHeader>
               <CardContent>
                 {ordersLoading ? (
-                  <div className="text-center py-8">Chargement...</div>
-                ) : orders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                    <p>Chargement...</p>
+                  </div>
+                ) : totalOrders === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                     <p>{t.noOrders}</p>
@@ -554,36 +611,6 @@ export default function CustomerAccount() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Résumé du compte */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Résumé du compte</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <Package className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                    <div className="text-2xl font-bold text-blue-900">{orders.length}</div>
-                    <div className="text-sm text-blue-600">Commandes totales</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <Star className="w-8 h-8 mx-auto mb-2 text-green-600" />
-                    <div className="text-2xl font-bold text-green-900">
-                      {orders.filter((o: any) => o.status === 'completed').length}
-                    </div>
-                    <div className="text-sm text-green-600">Commandes terminées</div>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <Calendar className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-                    <div className="text-2xl font-bold text-purple-900">
-                      {formatCurrency(orders.reduce((sum: number, order: any) => sum + (order.price || 0), 0))}
-                    </div>
-                    <div className="text-sm text-purple-600">{t.total} dépensé</div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
