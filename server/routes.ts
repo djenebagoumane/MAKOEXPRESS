@@ -1956,6 +1956,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create admin account - one time setup
+  app.post("/api/create-admin", async (req, res) => {
+    try {
+      // Check if admin already exists
+      const existingAdmin = await storage.getUserByIdentifier("goumanezeinab@gmail.com");
+      if (existingAdmin) {
+        return res.json({ message: "Compte admin existe déjà", email: "goumanezeinab@gmail.com" });
+      }
+
+      // Create admin account
+      const adminUser = await storage.createUser({
+        firstName: "Djeneba",
+        lastName: "Goumane", 
+        email: "goumanezeinab@gmail.com",
+        phoneNumber: "+223 70 12 34 56",
+        password: await require("./customAuth").hashPassword("Admin@2024!"),
+        role: "admin",
+        country: "Mali",
+        countryCode: "ML"
+      });
+
+      res.json({ 
+        message: "Compte admin créé avec succès",
+        email: "goumanezeinab@gmail.com",
+        password: "Admin@2024!",
+        role: "admin"
+      });
+    } catch (error) {
+      console.error("Error creating admin:", error);
+      res.status(500).json({ message: "Erreur lors de la création du compte admin" });
+    }
+  });
+
   // Password recovery route
   app.post("/api/forgot-password", async (req, res) => {
     try {
